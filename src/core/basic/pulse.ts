@@ -27,6 +27,8 @@ export interface MemoryChange {
 
 /** Everything that happened during one clock pulse, for display and for undo. */
 export interface PulseTrace {
+  /** Registers, flip-flops and SC before the clock edge (memory is not copied). */
+  before: Pick<MachineState, 'reg' | 'flag' | 'SC'>;
   signals: ControlSignals;
   busSource: BusSource;
   /** Value on the 16-bit bus, or null when no source is selected. */
@@ -106,6 +108,7 @@ export function pulse(s: MachineState): { next: MachineState; trace: PulseTrace 
     return {
       next,
       trace: {
+        before: { reg: s.reg, flag: s.flag, SC: s.SC },
         signals: c,
         busSource: BUS_SOURCES[c.busSelect],
         busValue: bus,
@@ -120,7 +123,7 @@ export function pulse(s: MachineState): { next: MachineState; trace: PulseTrace 
   notices.push('S = 0: the computer is halted and the clock does not advance.');
   return {
     next,
-    trace: { signals: c, busSource: 'none', busValue: null, acPaths: [], changes: [], memory, notices },
+    trace: { before: { reg: s.reg, flag: s.flag, SC: s.SC }, signals: c, busSource: 'none', busValue: null, acPaths: [], changes: [], memory, notices },
   };
 }
 
