@@ -57,7 +57,7 @@ export function ControlBar({ extra }: { extra?: React.ReactNode }) {
           value={speedIndex}
           onChange={(e) => setSpeedIndex(Number(e.target.value))}
           aria-valuetext={speedLabel(SPEEDS[speedIndex])}
-          style={{ width: 120, accentColor: 'var(--cyan)' }}
+          style={{ width: 120, accentColor: 'var(--active)' }}
         />
         <span className="mono muted" style={{ fontSize: 12, width: 92 }}>
           {speedLabel(SPEEDS[speedIndex])}

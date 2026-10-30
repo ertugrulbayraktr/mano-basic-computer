@@ -47,7 +47,7 @@ export function MemoryBlock() {
           </button>
         </div>
         {lastOp && (
-          <p className="mono" style={{ margin: '12px 0 0', color: 'var(--cyan)' }}>
+          <p className="mono" style={{ margin: '12px 0 0', color: 'var(--active)' }}>
             {lastOp}
           </p>
         )}
@@ -126,11 +126,11 @@ export function BusBlock() {
                   <tr key={i}>
                     <td>MUX {i}</td>
                     {mx.inputs.map((b, j) => (
-                      <td key={j} style={{ color: j === s ? 'var(--cyan)' : 'var(--muted)' }}>
+                      <td key={j} style={{ color: j === s ? 'var(--active)' : 'var(--muted)' }}>
                         {b}
                       </td>
                     ))}
-                    <td style={{ color: 'var(--cyan)' }}>{mx.out}</td>
+                    <td style={{ color: 'var(--active)' }}>{mx.out}</td>
                   </tr>
                 ))}
             </tbody>

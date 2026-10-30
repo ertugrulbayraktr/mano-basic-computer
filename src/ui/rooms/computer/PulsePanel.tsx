@@ -81,10 +81,10 @@ export function PulsePanel() {
         </div>
         <div className="sig">
           <span className="cap">Memory</span>
-          <span className="mono" style={{ color: c.memRead ? 'var(--cyan)' : 'var(--muted)' }}>
+          <span className="mono" style={{ color: c.memRead ? 'var(--active)' : 'var(--muted)' }}>
             Read {c.memRead ? '✓' : '—'}
           </span>
-          <span className="mono" style={{ color: c.memWrite ? 'var(--amber)' : 'var(--muted)' }}>
+          <span className="mono" style={{ color: c.memWrite ? 'var(--changed)' : 'var(--muted)' }}>
             Write {c.memWrite ? '✓' : '—'}
           </span>
         </div>
@@ -154,12 +154,12 @@ export function ExplainPanel() {
       </div>
       {t ? (
         explainPulse(t).map((p, i) => (
-          <p key={i} style={{ margin: '0 0 8px', fontSize: 16, lineHeight: 1.55, color: i >= t.signals.lines.length && t.signals.phase !== 'halted' ? 'var(--amber)' : '#d3e2f5' }}>
+          <p key={i} style={{ margin: '0 0 8px', fontSize: 16, lineHeight: 1.55, color: i >= t.signals.lines.length && t.signals.phase !== 'halted' ? 'var(--changed)' : 'var(--text)' }}>
             {p}
           </p>
         ))
       ) : (
-        <p style={{ margin: '0 0 8px', fontSize: 16, lineHeight: 1.55, color: '#d3e2f5' }}>
+        <p style={{ margin: '0 0 8px', fontSize: 16, lineHeight: 1.55, color: 'var(--text)' }}>
           Every instruction starts with a fetch: T0 copies PC to AR, T1 reads the instruction into IR, T2 decodes it. Load an example and step through it pulse by pulse.
         </p>
       )}

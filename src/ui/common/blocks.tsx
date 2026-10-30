@@ -101,7 +101,7 @@ export function CarryChain({
               <span className="cap" style={{ fontSize: 9 }}>
                 {stageLabel}
               </span>
-              <span style={{ color: 'var(--cyan)', fontWeight: 600 }}>
+              <span style={{ color: 'var(--active)', fontWeight: 600 }}>
                 {outLabel}
                 <sub>{i}</sub>={bitAt(out, i)}
               </span>
@@ -117,7 +117,7 @@ export function CarryChain({
 
 function Carry({ label, v }: { label: string; v: Bit }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0 4px', color: v ? 'var(--cyan)' : 'var(--muted)' }} title={`${label} = ${v}`}>
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '0 4px', color: v ? 'var(--active)' : 'var(--muted)' }} title={`${label} = ${v}`}>
       <span style={{ fontSize: 10 }}>{label}</span>
       <span>←{v}</span>
     </div>
@@ -131,8 +131,8 @@ export function Flag({ name, v, note, meaningless }: { name: string; v: Bit; not
       className="mono"
       title={note}
       style={{
-        border: `1px solid ${meaningless ? 'var(--line-soft)' : v ? 'var(--amber)' : 'var(--line)'}`,
-        color: meaningless ? 'var(--muted)' : v ? 'var(--amber)' : 'var(--text)',
+        border: `1px solid ${meaningless ? 'var(--line-soft)' : v ? 'var(--changed)' : 'var(--line)'}`,
+        color: meaningless ? 'var(--muted)' : v ? 'var(--changed)' : 'var(--text)',
         borderRadius: 3,
         padding: '6px 10px',
         textDecoration: meaningless ? 'line-through' : undefined,
@@ -154,14 +154,14 @@ export function Candidate({ title, op, value, selected, children }: { title: str
         gap: 6,
         padding: 14,
         borderRadius: 4,
-        border: selected ? '1px solid var(--cyan)' : '1px dashed var(--line)',
-        background: selected ? 'var(--cyan-soft)' : undefined,
-        boxShadow: selected ? '0 0 14px rgba(79,216,255,.25)' : undefined,
+        border: selected ? '1px solid var(--active)' : '1px dashed var(--line)',
+        background: selected ? 'var(--active-soft)' : undefined,
+        boxShadow: selected ? '0 0 14px rgb(37 99 235 / 25)' : undefined,
         color: selected ? 'var(--text)' : 'var(--muted)',
         minWidth: 0,
       }}
     >
-      <span className="cap" style={{ color: selected ? 'var(--cyan)' : undefined }}>
+      <span className="cap" style={{ color: selected ? 'var(--active)' : undefined }}>
         {title}
       </span>
       <span className="mono" style={{ fontSize: 14 }}>

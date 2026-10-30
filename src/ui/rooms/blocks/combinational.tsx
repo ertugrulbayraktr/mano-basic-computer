@@ -56,7 +56,7 @@ export function DecoderBlock() {
                   <td>1</td>
                   <td>{v.toString(2).padStart(3, '0').split('').join(' ')}</td>
                   {decoder(v, 3).map((d, i) => (
-                    <td key={i} style={{ color: d ? 'var(--cyan)' : undefined }}>
+                    <td key={i} style={{ color: d ? 'var(--active)' : undefined }}>
                       {d}
                     </td>
                   ))}
@@ -116,7 +116,7 @@ export function MuxBlock() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 14, fontFamily: 'var(--mono)' }}>
             {inputs.map((v, i) => (
-              <span key={i} style={{ color: i === s ? 'var(--cyan)' : 'var(--muted)' }}>
+              <span key={i} style={{ color: i === s ? 'var(--active)' : 'var(--muted)' }}>
                 I{i} = {v} {i === s ? '→ Y' : ''}
               </span>
             ))}

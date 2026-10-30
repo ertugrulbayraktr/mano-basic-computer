@@ -156,7 +156,7 @@ export function AssemblerPanel() {
             value={source}
             onChange={(e) => setSource(e.target.value)}
             rows={18}
-            style={{ background: '#06121f', color: 'var(--text)', border: '1px solid var(--line)', borderRadius: 4, padding: 10, fontSize: 13, lineHeight: 1.5, resize: 'vertical', tabSize: 8 }}
+            style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--line)', borderRadius: 4, padding: 10, fontSize: 13, lineHeight: 1.5, resize: 'vertical', tabSize: 8 }}
           />
           {result.errors.length > 0 && (
             <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }} aria-label="Errors">
@@ -170,7 +170,7 @@ export function AssemblerPanel() {
             </ul>
           )}
           {result.warnings.map((w, i) => (
-            <span key={i} className="mono" style={{ color: 'var(--amber)', fontSize: 13 }}>
+            <span key={i} className="mono" style={{ color: 'var(--changed)', fontSize: 13 }}>
               Line {w.line}: {w.message}
             </span>
           ))}

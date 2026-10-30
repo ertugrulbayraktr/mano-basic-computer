@@ -59,7 +59,7 @@ export function StateStrip() {
                 aria-label={`${f} = ${sim.state.flag[f]}, ${FLAG_TITLE[f]}`}
                 onClick={() => setFlag(f, sim.state.flag[f] ? 0 : 1)}
               >
-                {f}&nbsp;<b style={{ color: changed ? 'var(--amber)' : 'var(--text)' }}>{sim.state.flag[f]}</b>
+                {f}&nbsp;<b style={{ color: changed ? 'var(--changed)' : 'var(--text)' }}>{sim.state.flag[f]}</b>
               </button>
             );
           })}

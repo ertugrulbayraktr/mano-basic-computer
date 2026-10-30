@@ -54,7 +54,7 @@ export function GatesBlock() {
           const rows = truthTable(g);
           const hit = g === 'NOT' ? x : x * 2 + y;
           return (
-            <Panel key={g} title={g} refs={<span className="mono" style={{ color: out ? 'var(--cyan)' : 'var(--muted)' }}>F = {out}</span>}>
+            <Panel key={g} title={g} refs={<span className="mono" style={{ color: out ? 'var(--active)' : 'var(--muted)' }}>F = {out}</span>}>
               <GateSymbol name={g} x={x} y={y} out={out} />
               <Truth head={g === 'NOT' ? ['x', 'F'] : ['x', 'y', 'F']} rows={rows.map((r) => (g === 'NOT' ? [r.x, r.out] : [r.x, r.y, r.out]))} hit={hit} />
             </Panel>
@@ -155,14 +155,14 @@ export function FullAdderBlock() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontFamily: 'var(--mono)', minWidth: 'min-content' }}>
               <div style={{ border: '1px solid var(--line)', borderRadius: 4, padding: 10, background: 'var(--box)', display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <span className="cap">HA 1 (x, y)</span>
-                <span style={{ color: r.s1 ? 'var(--cyan)' : undefined }}>S1 = {r.s1}</span>
-                <span style={{ color: r.c1 ? 'var(--cyan)' : undefined }}>C1 = {r.c1}</span>
+                <span style={{ color: r.s1 ? 'var(--active)' : undefined }}>S1 = {r.s1}</span>
+                <span style={{ color: r.c1 ? 'var(--active)' : undefined }}>C1 = {r.c1}</span>
               </div>
               <span className="muted">→</span>
               <div style={{ border: '1px solid var(--line)', borderRadius: 4, padding: 10, background: 'var(--box)', display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <span className="cap">HA 2 (S1, z)</span>
-                <span style={{ color: r.s ? 'var(--cyan)' : undefined }}>S = {r.s}</span>
-                <span style={{ color: r.c2 ? 'var(--cyan)' : undefined }}>C2 = {r.c2}</span>
+                <span style={{ color: r.s ? 'var(--active)' : undefined }}>S = {r.s}</span>
+                <span style={{ color: r.c2 ? 'var(--active)' : undefined }}>C2 = {r.c2}</span>
               </div>
               <span className="muted">→</span>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

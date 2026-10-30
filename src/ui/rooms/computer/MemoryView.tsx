@@ -86,7 +86,7 @@ export function MemoryView() {
                   <span role="cell">
                     <button className="bp" aria-pressed={sim.breakpoints.has(a)} aria-label={`Breakpoint at ${a.toString(16)}`} onClick={() => toggleBreakpoint(a)} />
                   </span>
-                  <span role="cell" style={{ fontSize: 10, fontWeight: 600, color: a === PC ? 'var(--amber)' : 'var(--cyan)' }}>
+                  <span role="cell" style={{ fontSize: 10, fontWeight: 600, color: a === PC ? 'var(--changed)' : 'var(--active)' }}>
                     {tag}
                   </span>
                   <span role="cell" className="muted">

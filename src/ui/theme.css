@@ -1,27 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* Blueprint design language: cyan = active signal, amber = changed on this edge. */
+/*
+ * Light, modern minimal design language.
+ * Blue = active signal, orange = value changed on this clock edge, light gray = idle.
+ */
 :root {
-  --ground: #0a1a30;
-  --panel: rgba(14, 35, 64, 0.92);
-  --panel-solid: #0e2340;
-  --box: #0c1f3a;
-  --line: #2e5680;
-  --line-soft: #1e3d63;
-  --grid: rgba(110, 160, 220, 0.07);
-  --text: #e4eefa;
-  --text-2: #b8cde8;
-  --muted: #8aa6cb;
-  --cyan: #4fd8ff;
-  --cyan-ink: #06213a;
-  --cyan-soft: rgba(79, 216, 255, 0.12);
-  --amber: #ffb547;
-  --amber-soft: rgba(255, 181, 71, 0.1);
-  --alert: #ff8a5b;
-  --sans: 'IBM Plex Sans Condensed', system-ui, sans-serif;
-  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --ground: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --panel: #ffffff;
+  --panel-solid: #ffffff;
+  --box: #ffffff;
+  --line: #d4d8de;
+  --line-soft: #e8ebef;
+  --wire: #c3c9d1;
+  --grid: #e9ecf0;
+  --text: #111827;
+  --text-2: #374151;
+  --muted: #6b7280;
+  --active: #2563eb;
+  --active-ink: #ffffff;
+  --active-soft: #eff4ff;
+  --changed: #ea580c;
+  --changed-soft: #fff4ed;
+  --alert: #dc2626;
+  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
+  --radius: 8px;
+  --shadow: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.06);
   --beat: 350ms;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * {
@@ -30,19 +38,17 @@
 
 body {
   margin: 0;
-  background-color: var(--ground);
-  background-image:
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background: var(--surface-2);
   color: var(--text);
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 1.45;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
-  color: var(--cyan);
+  color: var(--active);
 }
 
 button,
@@ -54,7 +60,7 @@ textarea {
 }
 
 :focus-visible {
-  outline: 2px solid var(--cyan);
+  outline: 2px solid var(--active);
   outline-offset: 2px;
 }
 
@@ -65,7 +71,7 @@ textarea {
 .cap {
   font-family: var(--sans);
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
   font-size: 11px;
   font-weight: 600;
   color: var(--muted);
@@ -81,8 +87,9 @@ textarea {
 .panel {
   background: var(--panel);
   border: 1px solid var(--line-soft);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 16px;
+  box-shadow: var(--shadow);
 }
 
 .panel-head {
@@ -95,68 +102,75 @@ textarea {
 
 .btn {
   font-family: var(--sans);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  min-height: 40px;
-  padding: 0 14px;
-  border-radius: 4px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 6px;
   border: 1px solid var(--line);
-  background: var(--panel-solid);
+  background: var(--surface);
   color: var(--text);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
+  box-shadow: 0 1px 1px rgb(16 24 40 / 0.04);
+  text-decoration: none;
 }
 .btn:hover:not(:disabled) {
-  border-color: var(--cyan);
+  background: var(--surface-2);
 }
 .btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 .btn.primary {
-  background: var(--cyan);
-  color: var(--cyan-ink);
-  border-color: var(--cyan);
+  background: var(--active);
+  color: var(--active-ink);
+  border-color: var(--active);
+}
+.btn.primary:hover:not(:disabled) {
+  background: #1d4ed8;
 }
 .btn.small {
-  min-height: 30px;
-  padding: 0 10px;
+  min-height: 28px;
+  padding: 0 9px;
   font-size: 12px;
+}
+.btn[aria-pressed='true'] {
+  background: var(--active-soft);
+  border-color: var(--active);
+  color: var(--active);
 }
 
 .chip {
   font-family: var(--mono);
   font-size: 12px;
-  min-width: 32px;
-  height: 26px;
-  border-radius: 3px;
-  border: 1px solid #23466f;
+  min-width: 30px;
+  height: 24px;
+  border-radius: 5px;
+  border: 1px solid var(--line-soft);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--muted);
   padding: 0 6px;
-  background: transparent;
+  background: var(--surface);
 }
 .chip.on {
-  background: var(--cyan);
-  color: var(--cyan-ink);
-  border-color: var(--cyan);
+  background: var(--active);
+  color: var(--active-ink);
+  border-color: var(--active);
   font-weight: 600;
-  box-shadow: 0 0 10px rgba(79, 216, 255, 0.55);
 }
 .chip.next {
   border-style: dashed;
-  border-color: var(--cyan);
-  color: var(--text);
+  border-color: var(--active);
+  color: var(--active);
 }
 .chip.changed {
-  border-color: var(--amber);
-  color: var(--amber);
+  border-color: var(--changed);
+  color: var(--changed);
 }
 .chip.ctl {
   height: 18px;
@@ -165,65 +179,71 @@ textarea {
   padding: 0 4px;
 }
 .chip.ctl.lit {
-  color: var(--amber);
-  border-color: var(--amber);
+  color: var(--changed);
+  border-color: var(--changed);
 }
 
 .seg {
   display: inline-flex;
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: hidden;
+  background: var(--surface);
 }
 .seg button {
-  min-height: 34px;
-  padding: 0 12px;
+  min-height: 30px;
+  padding: 0 10px;
   border: 0;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
+  font-size: 12px;
+}
+.seg button + button {
+  border-left: 1px solid var(--line-soft);
 }
 .seg button[aria-pressed='true'],
 .seg button[aria-checked='true'] {
-  background: var(--cyan);
-  color: var(--cyan-ink);
+  background: var(--active-soft);
+  color: var(--active);
   font-weight: 600;
 }
 
 .changed-value {
-  color: var(--amber);
+  color: var(--changed);
 }
 .old-value {
   color: var(--muted);
   text-decoration: line-through;
-  font-size: 0.7em;
+  font-size: 0.75em;
 }
 
 .input {
-  min-height: 36px;
-  background: var(--ground);
+  min-height: 32px;
+  background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--text);
-  padding: 0 10px;
+  padding: 0 8px;
 }
 
 .bit {
   font-family: var(--mono);
-  font-size: 16px;
-  width: 38px;
-  height: 38px;
-  border-radius: 4px;
+  font-size: 15px;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
   border: 1px solid var(--line);
-  background: var(--box);
+  background: var(--surface);
   color: var(--muted);
   cursor: pointer;
   padding: 0;
 }
 .bit[aria-pressed='true'] {
-  background: #12305a;
-  color: var(--text);
-  border-color: var(--cyan);
+  background: var(--active-soft);
+  color: var(--active);
+  border-color: var(--active);
+  font-weight: 600;
 }
 .bit:disabled {
   cursor: default;
@@ -232,47 +252,46 @@ textarea {
 table.data {
   border-collapse: collapse;
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 12.5px;
 }
 table.data th {
   text-align: left;
   font-weight: 500;
   color: var(--muted);
   padding: 5px 10px;
+  font-family: var(--sans);
+  font-size: 12px;
 }
 table.data td {
   padding: 5px 10px;
-  border-top: 1px solid #16304f;
+  border-top: 1px solid var(--line-soft);
   color: var(--text-2);
 }
 table.data tr.hit td {
-  background: var(--cyan-soft);
+  background: var(--active-soft);
   color: var(--text);
 }
 table.data tr.hit td:first-child {
-  box-shadow: inset 3px 0 0 var(--cyan);
+  box-shadow: inset 2px 0 0 var(--active);
 }
 
 .notice {
-  border: 1px solid var(--amber);
-  background: var(--amber-soft);
-  border-radius: 4px;
+  border: 1px solid #fed7aa;
+  background: var(--changed-soft);
+  border-radius: 6px;
   padding: 8px 12px;
   color: var(--text);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .scroll-x {
   overflow-x: auto;
 }
 
-/* Signal animation: a glow that travels once per pulse. Disabled at high speed and for reduced motion. */
+/* Signal animation: a dash that travels once per step. Disabled at high speed and for reduced motion. */
 @keyframes flash {
   from {
-    filter: brightness(1.8);
-  }
-  to {
-    filter: brightness(1);
+    background-color: var(--changed-soft);
   }
 }
 .flash {
@@ -280,18 +299,17 @@ table.data tr.hit td:first-child {
 }
 @keyframes travel {
   from {
-    stroke-dashoffset: 40;
+    stroke-dashoffset: 24;
   }
   to {
     stroke-dashoffset: 0;
   }
 }
 .wire-active {
-  stroke: var(--cyan);
-  filter: drop-shadow(0 0 4px rgba(79, 216, 255, 0.8));
+  stroke: var(--active);
 }
 .wire-travel {
-  stroke-dasharray: 8 4;
+  stroke-dasharray: 6 3;
   animation: travel var(--beat) linear;
 }
 [data-fast='true'] .flash,

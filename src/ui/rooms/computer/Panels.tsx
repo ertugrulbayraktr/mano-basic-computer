@@ -29,7 +29,7 @@ export function HistoryPanel() {
                 <span className="muted">#{i + 1}</span>
                 <Word value={h.address} width={12} />
                 <span>{h.kind === 'interrupt' ? '—' : <Word value={h.word} width={16} />}</span>
-                <span style={{ color: h.kind === 'interrupt' ? 'var(--amber)' : 'var(--text)' }}>{h.text}</span>
+                <span style={{ color: h.kind === 'interrupt' ? 'var(--changed)' : 'var(--text)' }}>{h.text}</span>
                 <span className="muted">{current ? `T${sim.state.SC}…` : `p${h.pulse}`}</span>
               </li>
             );
@@ -94,7 +94,7 @@ export function IODevices() {
             style={{ width: 70, minHeight: 28 }}
           />
           pulses
-          {sim.devices.printerBusy > 0 && <span className="mono" style={{ color: 'var(--amber)' }}>busy: {sim.devices.printerBusy}</span>}
+          {sim.devices.printerBusy > 0 && <span className="mono" style={{ color: 'var(--changed)' }}>busy: {sim.devices.printerBusy}</span>}
         </span>
         <div className="printer" aria-live="polite" aria-label="Printer output">
           {sim.devices.printed.replace(/\r/g, '\n')}
@@ -144,10 +144,10 @@ export function AluDialog({ open, onClose }: { open: boolean; onClose: () => voi
           {AC_INPUTS.map((inp, i) => {
             const y = 20 + i * rowH;
             const on = active.has(inp.op);
-            const col = on ? 'var(--cyan)' : 'var(--line)';
+            const col = on ? 'var(--active)' : 'var(--line)';
             return (
               <g key={inp.op}>
-                <text x={0} y={y + 12} fontFamily="var(--mono)" fontSize={13} fill={on ? 'var(--cyan)' : 'var(--muted)'}>
+                <text x={0} y={y + 12} fontFamily="var(--mono)" fontSize={13} fill={on ? 'var(--active)' : 'var(--muted)'}>
                   {inp.control}
                 </text>
                 <text x={0} y={y + 28} fontFamily="var(--mono)" fontSize={12} fill="var(--text-2)">
@@ -163,8 +163,8 @@ export function AluDialog({ open, onClose }: { open: boolean; onClose: () => voi
               </g>
             );
           })}
-          <path d="M470 130 q30 0 50 30 q-20 30 -50 30 q14 -30 0 -60 z" fill="var(--box)" stroke={active.size ? 'var(--cyan)' : 'var(--line)'} strokeWidth={2} />
-          <line x1={520} x2={600} y1={160} y2={160} stroke={active.size ? 'var(--cyan)' : 'var(--line)'} strokeWidth={2} />
+          <path d="M470 130 q30 0 50 30 q-20 30 -50 30 q14 -30 0 -60 z" fill="var(--box)" stroke={active.size ? 'var(--active)' : 'var(--line)'} strokeWidth={2} />
+          <line x1={520} x2={600} y1={160} y2={160} stroke={active.size ? 'var(--active)' : 'var(--line)'} strokeWidth={2} />
           <text x={606} y={156} fontFamily="var(--mono)" fontSize={14} fill="var(--text)">
             to AC(i)
           </text>

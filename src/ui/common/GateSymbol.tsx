@@ -1,7 +1,7 @@
 import type { Bit } from '../../core/bits';
 import type { GateName } from '../../core/blocks/gates';
 
-const wire = (v: Bit | undefined) => (v ? 'var(--cyan)' : 'var(--line)');
+const wire = (v: Bit | undefined) => (v ? 'var(--active)' : 'var(--line)');
 
 /**
  * Distinctive-shape gate symbol (Fig. 1-2), 120 × 64, with input and output wires colored by

@@ -316,7 +316,7 @@ export function ShiftsBlock() {
                     </td>
                     <td>
                       {out.vs === undefined ? '—' : (
-                        <span style={{ color: out.vs ? 'var(--amber)' : undefined }}>
+                        <span style={{ color: out.vs ? 'var(--changed)' : undefined }}>
                           Vs = R{n - 1} ⊕ R{n - 2} = {bitAt(r, n - 1)} ⊕ {bitAt(r, n - 2)} = {out.vs}
                         </span>
                       )}
@@ -361,16 +361,16 @@ export function ShifterBlock() {
               .reverse()
               .map(({ m, i }) => (
                 <div key={i} style={{ border: '1px solid var(--line)', borderRadius: 4, padding: '6px 8px', display: 'flex', flexDirection: 'column', gap: 3, alignItems: 'center', background: 'var(--box)' }}>
-                  <span style={{ color: s === 0 ? 'var(--cyan)' : 'var(--muted)' }}>
+                  <span style={{ color: s === 0 ? 'var(--active)' : 'var(--muted)' }}>
                     0: {i === n - 1 ? 'IR' : `A${i + 1}`}={m.in0}
                   </span>
-                  <span style={{ color: s === 1 ? 'var(--cyan)' : 'var(--muted)' }}>
+                  <span style={{ color: s === 1 ? 'var(--active)' : 'var(--muted)' }}>
                     1: {i === 0 ? 'IL' : `A${i - 1}`}={m.in1}
                   </span>
                   <span className="cap" style={{ fontSize: 9 }}>
                     MUX
                   </span>
-                  <span style={{ color: 'var(--cyan)', fontWeight: 600 }}>
+                  <span style={{ color: 'var(--active)', fontWeight: 600 }}>
                     H<sub>{i}</sub>={m.out}
                   </span>
                 </div>
@@ -443,7 +443,7 @@ export function AluBlock() {
         </div>
         <div className="row" style={{ marginTop: 14, alignItems: 'center' }}>
           <span className="result">
-            F = <span style={{ color: 'var(--cyan)' }}><Word value={r.f} width={n} /></span>
+            F = <span style={{ color: 'var(--active)' }}><Word value={r.f} width={n} /></span>
           </span>
           <Flag name="C" v={r.status.c} meaningless={!r.carryMeaningful} note="Carry out of the last stage" />
           <Flag name="S" v={r.status.s} note="Sign bit F(n−1)" />

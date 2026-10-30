@@ -52,10 +52,10 @@ function Wire({ y, state, sel, pulse }: { y: number; state: WireState; sel?: num
         stroke="var(--line)"
         className={active ? 'wire-active wire-travel' : ''}
       />
-      {state === 'out' && <polygon points={`${BUS_X - 2},${y} ${BUS_X - 10},${y - 5} ${BUS_X - 10},${y + 5}`} fill="var(--cyan)" />}
-      {state === 'in' && <polygon points={`${BOX_R + 1},${y} ${BOX_R + 9},${y - 5} ${BOX_R + 9},${y + 5}`} fill="var(--cyan)" />}
+      {state === 'out' && <polygon points={`${BUS_X - 2},${y} ${BUS_X - 10},${y - 5} ${BUS_X - 10},${y + 5}`} fill="var(--active)" />}
+      {state === 'in' && <polygon points={`${BOX_R + 1},${y} ${BOX_R + 9},${y - 5} ${BOX_R + 9},${y + 5}`} fill="var(--active)" />}
       {sel !== undefined && (
-        <text x={BOX_R + 22} y={y - 6} fontFamily="var(--mono)" fontSize={11} fill={active ? 'var(--cyan)' : 'var(--muted)'}>
+        <text x={BOX_R + 22} y={y - 6} fontFamily="var(--mono)" fontSize={11} fill={active ? 'var(--active)' : 'var(--muted)'}>
           {sel}
         </text>
       )}
@@ -84,7 +84,7 @@ function RegisterBox({ name, top, t, height = 50, inline = false }: { name: RegN
   return (
     <div
       className="dp-box"
-      style={{ top, height, ...(inline ? { left: 0, width: "100%" } : {}), borderColor: change ? "var(--amber)" : undefined, background: change ? "var(--amber-soft)" : undefined }}
+      style={{ top, height, ...(inline ? { left: 0, width: "100%" } : {}), borderColor: change ? "var(--changed)" : undefined, background: change ? "var(--changed-soft)" : undefined }}
     >
       <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontWeight: 600 }} title={`${REG_TITLE[name]} (${REG_WIDTH[name]} bits)`}>
@@ -130,21 +130,21 @@ export function Datapath({ onOpenAlu }: { onOpenAlu: () => void }) {
       <div className="scroll-x">
         <div className="datapath" style={{ position: 'relative', width: 440, height: 716 }}>
           <svg width={440} height={716} style={{ position: 'absolute', inset: 0 }} aria-hidden="true">
-            <rect x={BUS_X} y={22} width={8} height={680} rx={2} fill={busy ? 'var(--cyan)' : 'var(--line)'} className={busy ? 'wire-active' : ''} />
+            <rect x={BUS_X} y={22} width={8} height={680} rx={2} fill={busy ? 'var(--active)' : 'var(--line)'} className={busy ? 'wire-active' : ''} />
             <Wire y={66} state={memState} sel={7} pulse={sim.pulses} />
             {ROWS.filter((r) => r.name !== 'INPR').map((r) => (
               <Wire key={r.name} y={r.top + 25} state={wireState(t, r.name)} sel={r.sel} pulse={sim.pulses} />
             ))}
             <Wire y={AC_CENTER} state={acRole} sel={4} pulse={sim.pulses} />
             {/* INPR feeds the adder and logic circuit. */}
-            <line x1={60} x2={60} y1={AC_TOP + 132} y2={460} stroke={t?.acPaths.some((p) => p.op === 'INPR') ? 'var(--cyan)' : 'var(--line)'} strokeWidth={2} />
+            <line x1={60} x2={60} y1={AC_TOP + 132} y2={460} stroke={t?.acPaths.some((p) => p.op === 'INPR') ? 'var(--active)' : 'var(--line)'} strokeWidth={2} />
           </svg>
 
-          <div className="mono" style={{ position: 'absolute', left: 300, top: 0, fontSize: 11, color: busy ? 'var(--cyan)' : 'var(--muted)' }}>
+          <div className="mono" style={{ position: 'absolute', left: 300, top: 0, fontSize: 11, color: busy ? 'var(--active)' : 'var(--muted)' }}>
             S2S1S0 = {toBin(t?.signals.busSelect ?? 0, 3)}
           </div>
 
-          <div className="dp-box" style={{ top: 34, height: 64, borderColor: memState !== 'idle' ? 'var(--cyan)' : undefined }}>
+          <div className="dp-box" style={{ top: 34, height: 64, borderColor: memState !== 'idle' ? 'var(--active)' : undefined }}>
             <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <span style={{ fontWeight: 600 }}>Memory unit</span>
               <span className="cap" style={{ fontSize: 10 }}>
@@ -152,8 +152,8 @@ export function Datapath({ onOpenAlu }: { onOpenAlu: () => void }) {
               </span>
             </span>
             <span style={{ textAlign: 'right' }}>
-              <EditableValue value={sim.state.mem[AR]} width={16} label={`M[${AR.toString(16)}]`} onCommit={(v) => setMemory(AR, v)} style={{ fontSize: 18, color: memState !== 'idle' ? 'var(--cyan)' : undefined }} />
-              <div className="cap" style={{ fontSize: 10, color: memState !== 'idle' ? 'var(--cyan)' : undefined }}>
+              <EditableValue value={sim.state.mem[AR]} width={16} label={`M[${AR.toString(16)}]`} onCommit={(v) => setMemory(AR, v)} style={{ fontSize: 18, color: memState !== 'idle' ? 'var(--active)' : undefined }} />
+              <div className="cap" style={{ fontSize: 10, color: memState !== 'idle' ? 'var(--active)' : undefined }}>
                 {t?.signals.memRead ? 'Read' : t?.signals.memWrite ? 'Write' : 'M'}[<Word value={AR} width={12} />]
               </div>
             </span>
@@ -167,12 +167,12 @@ export function Datapath({ onOpenAlu }: { onOpenAlu: () => void }) {
             <button
               className="alu-button"
               onClick={onOpenAlu}
-              style={{ borderColor: acLoaded ? 'var(--cyan)' : undefined, boxShadow: acLoaded ? '0 0 10px rgba(79,216,255,.4)' : undefined }}
+              style={{ borderColor: acLoaded ? 'var(--active)' : undefined, boxShadow: acLoaded ? '0 0 10px rgb(37 99 235 / 4)' : undefined }}
             >
               <span>
                 <b>Adder &amp; logic</b> <Ref>Fig. 5-21</Ref>
               </span>
-              <span className="cap" style={{ color: 'var(--cyan)' }}>
+              <span className="cap" style={{ color: 'var(--active)' }}>
                 Open ›
               </span>
             </button>
@@ -181,7 +181,7 @@ export function Datapath({ onOpenAlu }: { onOpenAlu: () => void }) {
                 className="mono e-box"
                 onClick={() => setFlag('E', sim.state.flag.E ? 0 : 1)}
                 title="E flip-flop (click to toggle)"
-                style={{ borderColor: eChange ? 'var(--amber)' : undefined, color: eChange ? 'var(--amber)' : undefined }}
+                style={{ borderColor: eChange ? 'var(--changed)' : undefined, color: eChange ? 'var(--changed)' : undefined }}
               >
                 <b style={{ fontFamily: 'var(--sans)' }}>E</b> {sim.state.flag.E}
               </button>
