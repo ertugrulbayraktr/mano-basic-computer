@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { disassemble } from '../../../core/basic/disasm';
 import { MEMORY_WORDS } from '../../../core/basic/types';
-import { EditableValue, Word } from '../../common/controls';
+import { EditableValue } from '../../common/controls';
 import { parseWord } from '../../common/format';
 import { useComputer, useSim } from './store';
 
@@ -90,10 +90,10 @@ export function MemoryView() {
                     {tag}
                   </span>
                   <span role="cell" className="muted">
-                    <Word value={a} width={12} />
+                    {a.toString(16).toUpperCase().padStart(3, "0")}
                   </span>
                   <span role="cell">
-                    <EditableValue value={word} width={16} label={`memory word ${a.toString(16)}`} onCommit={(v) => setMemory(a, v)} className={written.has(a) ? 'changed-value' : ''} />
+                    <EditableValue compact value={word} width={16} label={`memory word ${a.toString(16)}`} onCommit={(v) => setMemory(a, v)} className={written.has(a) ? 'changed-value' : ''} />
                   </span>
                   <span role="cell" style={{ color: word ? 'var(--text-2)' : 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {disassemble(word).text}

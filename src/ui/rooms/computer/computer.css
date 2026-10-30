@@ -105,7 +105,7 @@
 }
 .mem-row {
   display: grid;
-  grid-template-columns: 22px 34px 40px 54px minmax(0, 1fr);
+  grid-template-columns: 22px 34px auto auto minmax(0, 1fr);
   gap: 8px;
   align-items: center;
   height: 28px;
@@ -190,4 +190,172 @@ dialog.modal {
 }
 dialog.modal::backdrop {
   background: rgb(15 23 42 / 0.35);
+}
+
+/* ---- Circuit workbench ---- */
+.computer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.workbench {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+.stage {
+  flex: 999 1 640px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.side {
+  flex: 1 1 340px;
+  max-width: 400px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.canvas-wrap {
+  position: relative;
+  height: calc(100vh - 150px);
+  min-height: 560px;
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.canvas:active {
+  cursor: grabbing;
+}
+.canvas-tools {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  gap: 4px;
+}
+.expect {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.btn-group {
+  display: inline-flex;
+  gap: 4px;
+}
+.step-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rtl-sm {
+  font-size: 14px;
+  line-height: 1.4;
+}
+.rtl-sm .cf {
+  color: var(--active);
+  font-weight: 600;
+}
+.substeps {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.substep-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 0;
+  background: none;
+  padding: 6px 4px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: left;
+  border-radius: 6px;
+}
+.substep-head:hover {
+  background: var(--surface-2);
+}
+.substep-no {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex: none;
+}
+.substeps li.done .substep-head {
+  color: var(--text-2);
+}
+.substeps li.done .substep-no {
+  background: var(--surface-2);
+}
+.substeps li.current .substep-head {
+  color: var(--active);
+  font-weight: 600;
+}
+.substeps li.current .substep-no {
+  background: var(--active);
+  border-color: var(--active);
+  color: #fff;
+}
+.substep-text {
+  margin: 0 0 6px 32px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.substep-text p {
+  margin: 0 0 4px;
+}
+.substeps li.done .substep-text {
+  color: var(--muted);
+}
+.why {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 8px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.why p {
+  margin: 4px 0 0;
+}
+.tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.tabs button {
+  border: 0;
+  background: none;
+  padding: 8px 10px;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tabs button[aria-selected='true'] {
+  color: var(--active);
+  border-bottom-color: var(--active);
 }

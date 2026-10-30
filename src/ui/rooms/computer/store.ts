@@ -21,6 +21,13 @@ interface ComputerStore {
   running: boolean;
   status: string | null;
   program: LoadedProgram | null;
+  /**
+   * Which sub-step of the last pulse is shown: 0 decode, 1 control gates, 2 data flow,
+   * 3 clock edge (the pulse is complete). See core/basic/microsteps.ts.
+   */
+  sub: number;
+  subNext: () => void;
+  subPrev: () => void;
   pulse: () => void;
   instruction: () => void;
   back: () => void;
@@ -42,8 +49,11 @@ useSettings.subscribe((s) => (sim.printerDelay = s.printerDelay));
 
 let frame = 0;
 
+/** Up to this many pulses per second, Run shows every sub-step of every pulse. */
+export const SUBSTEP_SPEED = 4;
+
 export const useComputer = create<ComputerStore>((set, get) => {
-  const bump = (status: string | null = null) => set((s) => ({ version: s.version + 1, status }));
+  const bump = (status: string | null = null, sub = 3) => set((s) => ({ version: s.version + 1, status, sub }));
   const haltedStatus = () => (sim.halted ? 'Halted (S = 0).' : null);
 
   const stopLoop = () => {
@@ -57,6 +67,30 @@ export const useComputer = create<ComputerStore>((set, get) => {
     let first = true;
     const tick = (now: number) => {
       const speed = SPEEDS[useSettings.getState().speedIndex];
+      // At low speeds every sub-step is shown, four per pulse.
+      if (speed <= SUBSTEP_SPEED) {
+        budget += ((now - last) / 1000) * speed * 4;
+        last = now;
+        let k = Math.floor(budget);
+        budget -= k;
+        while (k-- > 0) {
+          if (get().sub === 3) {
+            if (sim.halted) {
+              set({ running: false });
+              return bump('Halted (S = 0).');
+            }
+            if (!first && sim.atBreakpoint()) {
+              set({ running: false });
+              return bump(`Breakpoint at ${sim.state.reg.PC.toString(16).toUpperCase().padStart(3, '0')}.`);
+            }
+            first = false;
+            sim.step();
+            bump(null, 0);
+          } else bump(null, get().sub + 1);
+        }
+        frame = requestAnimationFrame(tick);
+        return;
+      }
       budget += speed === Infinity ? 20_000 : ((now - last) / 1000) * speed;
       last = now;
       let n = Math.min(Math.floor(budget), 20_000);
@@ -76,7 +110,7 @@ export const useComputer = create<ComputerStore>((set, get) => {
       bump();
       frame = requestAnimationFrame(tick);
     };
-    // The first pulse happens immediately so Run always responds.
+    // The first step happens immediately so Run always responds.
     budget = 1;
     frame = requestAnimationFrame(tick);
   };
@@ -93,14 +127,30 @@ export const useComputer = create<ComputerStore>((set, get) => {
     running: false,
     status: null,
     program: null,
+    sub: 3,
+    subNext: () => {
+      get().pause();
+      if (sim.lastTrace && get().sub < 3) return bump(null, get().sub + 1);
+      if (sim.halted) return bump(haltedStatus());
+      sim.step();
+      bump(null, 0);
+    },
+    subPrev: () => {
+      get().pause();
+      if (sim.lastTrace && get().sub > 0) return bump(null, get().sub - 1);
+      sim.stepBack();
+      bump(null, 3);
+    },
     pulse: () => {
       get().pause();
+      // Finish a pulse that is being shown sub-step by sub-step before starting a new one.
+      if (sim.lastTrace && get().sub < 3) return bump();
       sim.step();
       bump(haltedStatus());
     },
     instruction: () => {
       get().pause();
-      sim.stepInstruction();
+      if (!(sim.lastTrace && get().sub < 3 && sim.state.SC === 0)) sim.stepInstruction();
       bump(haltedStatus());
     },
     back: () => {

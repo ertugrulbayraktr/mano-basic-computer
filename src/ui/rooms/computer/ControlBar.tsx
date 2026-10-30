@@ -25,11 +25,17 @@ export function ControlBar({ extra }: { extra?: React.ReactNode }) {
         <Icon d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5" />
         Reset
       </button>
-      <button className="btn" onClick={s.back} disabled={!sim.canStepBack} title="Undo the last pulse or edit">
-        <Icon d="M19 5L9 12l10 7zM5 5v14" />
-        Step back
-      </button>
-      <button className="btn primary" onClick={s.pulse} disabled={sim.halted} title="Apply one clock pulse">
+      <span className="btn-group">
+        <button className="btn" onClick={s.subPrev} disabled={!sim.canStepBack && !(sim.lastTrace && s.sub > 0)} title="Previous sub-step (undoes pulses and edits)">
+          <Icon d="M15 5l-7 7 7 7" />
+          Back
+        </button>
+        <button className="btn primary" onClick={s.subNext} disabled={sim.halted && (!sim.lastTrace || s.sub === 3)} title="Next sub-step: decode → control gates → data flow → clock edge">
+          Step
+          <Icon d="M9 5l7 7-7 7" />
+        </button>
+      </span>
+      <button className="btn" onClick={s.pulse} disabled={sim.halted && s.sub === 3} title="Complete one whole clock pulse">
         <Icon d="M4 18h4V6h8v12h4" />
         Pulse
       </button>

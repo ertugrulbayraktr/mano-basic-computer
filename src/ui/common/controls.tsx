@@ -75,6 +75,7 @@ export function EditableValue({
   label,
   className = '',
   style,
+  compact = false,
 }: {
   value: number;
   width: number;
@@ -82,8 +83,12 @@ export function EditableValue({
   label: string;
   className?: string;
   style?: React.CSSProperties;
+  /** In narrow places, show hexadecimal instead of long binary words. */
+  compact?: boolean;
 }) {
-  const { base, signed } = useSettings();
+  const settings = useSettings();
+  const base = compact && settings.base === 'bin' ? 'hex' : settings.base;
+  const { signed } = settings;
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState('');
   const [error, setError] = useState(false);
