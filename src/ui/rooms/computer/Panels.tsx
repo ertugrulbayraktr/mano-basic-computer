@@ -126,7 +126,9 @@ export function AluDialog({ open, onClose }: { open: boolean; onClose: () => voi
     if (!open && d.open) d.close();
   }, [open]);
   const t = sim.lastTrace;
-  const active = new Map(t?.acPaths.map((p) => [p.op, p]));
+  // The circuit settles in the data-flow sub-step (see microsteps.ts).
+  const sub = useComputer((s) => s.sub);
+  const active = new Map(sub >= 2 ? t?.acPaths.map((p) => [p.op, p]) : []);
   const rowH = 44;
   return (
     <dialog ref={ref} className="modal" onClose={onClose} aria-labelledby="alu-title">
