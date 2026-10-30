@@ -1,9 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { App } from './ui/App';
+import './ui/theme.css';
 
-// Placeholder shell; the UI is built after the design direction is approved.
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <p>Mano Basic Computer — work in progress.</p>
+    <App />
   </StrictMode>,
 );
