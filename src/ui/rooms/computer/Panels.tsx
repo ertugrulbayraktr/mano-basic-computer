@@ -188,8 +188,8 @@ export function AluDialog({ open, onClose }: { open: boolean; onClose: () => voi
           )}
         </span>
         <span style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-          <Link to="/alu/alu" className="btn" onClick={onClose}>
-            Explore the general ALU in Room 2 ›
+          <Link to="/alu" className="btn" onClick={onClose}>
+            Open the ALU circuit (Fig. 4-13) ›
           </Link>
           <button className="btn primary" onClick={onClose}>
             Close

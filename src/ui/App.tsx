@@ -2,14 +2,18 @@ import { useEffect } from 'react';
 import { HashRouter, Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { BaseSwitch } from './common/controls';
 import { BuildingBlocksRoom } from './rooms/blocks/BuildingBlocksRoom';
+import { AluCircuitPage } from './rooms/alu/AluCircuitPage';
 import { AluLabRoom } from './rooms/alu/AluLabRoom';
 import { BasicComputerRoom } from './rooms/computer/BasicComputerRoom';
 import './app.css';
 
-const ROOMS = [
-  { to: '/blocks', no: '01', name: 'Building Blocks', chapters: 'Ch. 1-2, Sec. 4-1 to 4-3' },
-  { to: '/alu', no: '02', name: 'ALU Lab', chapters: 'Sec. 4-4 to 4-7, 8-7' },
-  { to: '/computer', no: '03', name: 'Basic Computer', chapters: 'Ch. 5, Ch. 6' },
+const MAIN = [
+  { to: '/computer', name: 'Basic Computer', chapters: 'Ch. 5-6 · the whole computer as a circuit' },
+  { to: '/alu', name: 'ALU', chapters: 'Fig. 4-13 · the arithmetic logic shift unit as a circuit' },
+];
+const MORE = [
+  { to: '/blocks', name: 'Building blocks', chapters: 'Ch. 1-2, Sec. 4-1 to 4-3' },
+  { to: '/lab', name: 'ALU lab', chapters: 'Sec. 4-4 to 4-7, 8-7' },
 ];
 
 /** Opens each section at its top instead of keeping the previous scroll position. */
@@ -31,10 +35,16 @@ export function App() {
             <span className="brand-name">MANO</span>
             <span className="cap">Basic Computer Simulator</span>
           </a>
-          <nav aria-label="Rooms" className="rooms">
-            {ROOMS.map((r) => (
+          <nav aria-label="Sections" className="rooms">
+            {MAIN.map((r) => (
               <NavLink key={r.to} to={r.to} className="room-link" title={r.chapters}>
-                <span className="mono room-no">{r.no}</span> {r.name}
+                {r.name}
+              </NavLink>
+            ))}
+            <span className="nav-sep" aria-hidden="true" />
+            {MORE.map((r) => (
+              <NavLink key={r.to} to={r.to} className="room-link secondary" title={r.chapters}>
+                {r.name}
               </NavLink>
             ))}
           </nav>
@@ -44,7 +54,8 @@ export function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/computer" replace />} />
             <Route path="/blocks/*" element={<BuildingBlocksRoom />} />
-            <Route path="/alu/*" element={<AluLabRoom />} />
+            <Route path="/alu" element={<AluCircuitPage />} />
+            <Route path="/lab/*" element={<AluLabRoom />} />
             <Route path="/computer" element={<BasicComputerRoom />} />
             <Route path="*" element={<Navigate to="/computer" replace />} />
           </Routes>

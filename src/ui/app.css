@@ -140,3 +140,11 @@
 .muted {
   color: var(--muted);
 }
+.nav-sep {
+  width: 1px;
+  background: var(--line);
+  margin: 6px 8px;
+}
+.room-link.secondary {
+  font-size: 13px;
+}

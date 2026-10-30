@@ -156,6 +156,66 @@ export function Gate({ type, x, y, w = 26, h = 20, on }: { type: 'AND' | 'OR'; x
   );
 }
 
+/**
+ * A multiplexer drawn as a trapezoid, inputs on the left (index 0 at the top), output on the
+ * right, select lines entering from the top. `selected` lights the chosen input path.
+ */
+export function Mux({
+  x,
+  y,
+  w = 34,
+  h,
+  inputs,
+  selected,
+  on,
+  title,
+}: {
+  x: number;
+  y: number;
+  w?: number;
+  h: number;
+  inputs: string[];
+  selected?: number;
+  on?: boolean;
+  title?: string;
+}) {
+  const n = inputs.length;
+  const gap = h / n;
+  const inY = (k: number) => y + gap * (k + 0.5);
+  return (
+    <g>
+      {title && <title>{title}</title>}
+      <path
+        d={`M${x} ${y} L${x + w} ${y + 8} L${x + w} ${y + h - 8} L${x} ${y + h} Z`}
+        fill={on ? 'var(--active-soft)' : 'var(--surface)'}
+        stroke={color(on)}
+        strokeWidth={1.3}
+        style={{ transition: 'fill 160ms, stroke 160ms' }}
+      />
+      {inputs.map((_, k) => (
+        <Text key={k} at={[x + 4, inY(k)]} size={8.5} mono tone={on && selected === k ? 'active' : 'muted'} weight={on && selected === k ? 600 : 400}>
+          {k}
+        </Text>
+      ))}
+      {on && selected !== undefined && (
+        <polyline
+          points={`${x + 11},${inY(selected)} ${x + w - 4},${y + h / 2}`}
+          stroke="var(--active)"
+          strokeWidth={1.4}
+          fill="none"
+          strokeDasharray="3 2"
+        />
+      )}
+      <Text at={[x + w / 2 + 3, y + h - 14]} size={8} anchor="middle" tone="muted">
+        MUX
+      </Text>
+    </g>
+  );
+}
+
+/** Input y of a Mux input, for wiring. */
+export const muxInputY = (y: number, h: number, n: number, k: number) => y + (h / n) * (k + 0.5);
+
 /** A control input pin on a register (LD, INR, CLR): a short stub with its name. */
 export function Pin({ at, name, on, side = 'top' }: { at: Pt; name: string; on?: boolean; side?: 'top' | 'left' }) {
   const [x, y] = at;

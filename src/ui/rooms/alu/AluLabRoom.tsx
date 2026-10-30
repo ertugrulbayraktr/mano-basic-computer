@@ -27,7 +27,7 @@ const SECTIONS = [
 export function AluLabRoom() {
   return (
     <div className="room">
-      <RoomMenu base="/alu" items={SECTIONS} label="ALU Lab sections" />
+      <RoomMenu base="/lab" items={SECTIONS} label="ALU Lab sections" />
       <div className="room-content">
         <Routes>
           <Route index element={<Navigate to="alu" replace />} />
