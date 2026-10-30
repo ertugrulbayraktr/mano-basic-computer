@@ -131,7 +131,9 @@ export function controlSignals(s: MachineState): ControlSignals {
     return c;
   }
 
-  if (R) {
+  // Only T0-T2 are qualified by R (RT0-RT2 vs. R'T0-R'T2). From T3 on, the control functions
+  // depend on D and I alone, so an instruction that set R during its execution still finishes.
+  if (R && T <= 2) {
     // Interrupt cycle (Fig. 5-13).
     c.phase = 'interrupt';
     if (T === 0) {

@@ -341,6 +341,18 @@ describe('interrupt cycle (Fig. 5-13)', () => {
     expect(sim.history.map((h) => h.text)).toEqual(['INC', 'Interrupt cycle']);
   });
 
+  it('lets a memory-reference instruction finish after R is set at T3', () => {
+    // BUN 105 at 100: R is set at T3 (IEN = 1, FGI = 1), and D4T4 must still load PC.
+    const sim = machine({ mem: { 0x100: 0x4105 }, reg: { PC: 0x100 }, flag: { IEN: 1, FGI: 1 } });
+    const traces = sim.stepInstruction();
+    expect(traces.map((t) => t.signals.lines[0].control)).toEqual(["R'T0", "R'T1", "R'T2", "D7'I'T3", 'D4T4']);
+    expect(sim.state.flag.R).toBe(1);
+    expect(sim.state.reg.PC).toBe(0x105);
+    const cycle = sim.stepInstruction();
+    expect(cycle.map((t) => t.signals.lines[0].control)).toEqual(['RT0', 'RT1', 'RT2']);
+    expect(sim.state.mem[0]).toBe(0x105);
+  });
+
   it('does not request an interrupt during T0-T2 or while IEN = 0', () => {
     const sim = machine({ mem: { 0x100: 0x7020 }, reg: { PC: 0x100 }, flag: { IEN: 0, FGI: 1 } });
     sim.stepInstruction();
