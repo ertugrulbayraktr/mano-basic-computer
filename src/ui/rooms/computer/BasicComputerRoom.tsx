@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SPEEDS, useSettings } from '../../settings';
+import { AssemblerPanel, useAssembler } from './AssemblerPanel';
 import { ControlBar } from './ControlBar';
 import { Datapath } from './Datapath';
 import { MemoryView } from './MemoryView';
@@ -14,6 +15,7 @@ export function BasicComputerRoom() {
   const running = useComputer((s) => s.running);
   const program = useComputer((s) => s.program);
   const speed = SPEEDS[useSettings((s) => s.speedIndex)];
+  const asmOpen = useAssembler((s) => s.open);
 
   return (
     <div data-fast={running && speed > 10} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -24,6 +26,7 @@ export function BasicComputerRoom() {
           {program.expect}
         </p>
       )}
+      {asmOpen && <AssemblerPanel />}
       <StateStrip />
       <div className="cols">
         <Datapath onOpenAlu={() => setAluOpen(true)} />

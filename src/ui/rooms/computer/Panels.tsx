@@ -45,6 +45,12 @@ export function IODevices() {
   const pressKey = useComputer((s) => s.pressKey);
   const { printerDelay, setPrinterDelay } = useSettings();
   const [last, setLast] = useState<string | null>(null);
+  const send = (ch: string) =>
+    setLast(
+      pressKey(ch)
+        ? `'${ch === '\r' ? 'CR' : ch}' → INPR = ${ch.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}, FGI = 1`
+        : 'Rejected: FGI is still 1',
+    );
   return (
     <section className="panel" aria-label="Input and output devices" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div className="panel-head" style={{ marginBottom: 0 }}>
@@ -59,12 +65,16 @@ export function IODevices() {
           className="input mono"
           placeholder="Click here and type a character"
           value=""
-          onChange={() => {}}
+          // Text that arrives without a keydown (paste, IME, automation) is handled here.
+          onChange={(e) => {
+            const ch = e.target.value.slice(-1);
+            if (ch) send(ch);
+          }}
           onKeyDown={(e) => {
-            const ch = e.key === 'Enter' ? '\r' : e.key.length === 1 ? e.key : null;
+            const ch = e.key === 'Enter' ? '\r' : e.key.length === 1 && !e.ctrlKey && !e.metaKey ? e.key : null;
             if (ch === null) return;
             e.preventDefault();
-            setLast(pressKey(ch) ? `'${ch === '\r' ? 'CR' : ch}' → INPR = ${ch.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}, FGI = 1` : 'Rejected: FGI is still 1');
+            send(ch);
           }}
           style={{ minHeight: 44 }}
         />

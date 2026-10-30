@@ -1,4 +1,6 @@
+import { ASM_EXAMPLES } from '../../../core/programs/asmExamples';
 import { HEX_EXAMPLES } from '../../../core/programs/examples';
+import { loadAssembly, useAssembler } from './AssemblerPanel';
 import { SPEEDS, useSettings } from '../../settings';
 import { useComputer, useSim } from './store';
 
@@ -14,6 +16,8 @@ export function ControlBar({ extra }: { extra?: React.ReactNode }) {
   const sim = useSim();
   const s = useComputer();
   const { speedIndex, setSpeedIndex } = useSettings();
+  const asm = useAssembler();
+  const exampleIds = [...HEX_EXAMPLES, ...ASM_EXAMPLES].map((e) => e.id);
 
   return (
     <section aria-label="Clock controls" className="cbar">
@@ -63,20 +67,37 @@ export function ControlBar({ extra }: { extra?: React.ReactNode }) {
         <span className="cap">Example</span>
         <select
           className="input"
-          value={HEX_EXAMPLES.some((e) => e.id === s.program?.id) ? s.program?.id : ''}
+          value={s.program && exampleIds.includes(s.program.id) ? s.program.id : ''}
           onChange={(e) => {
             const ex = HEX_EXAMPLES.find((x) => x.id === e.target.value);
             if (ex) s.load({ id: ex.id, title: ex.title, mem: ex.mem, reg: ex.reg, flag: ex.flag, expect: ex.expect });
+            const asmEx = ASM_EXAMPLES.find((x) => x.id === e.target.value);
+            if (asmEx) {
+              asm.setSource(asmEx.source);
+              loadAssembly(asmEx.source, asmEx.title, asmEx);
+            }
           }}
         >
           <option value="">Choose…</option>
-          {HEX_EXAMPLES.map((e) => (
-            <option key={e.id} value={e.id}>
-              {e.title}
-            </option>
-          ))}
+          <optgroup label="Machine code (Ch. 5)">
+            {HEX_EXAMPLES.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.title}
+              </option>
+            ))}
+          </optgroup>
+          <optgroup label="Assembly (Ch. 6)">
+            {ASM_EXAMPLES.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.title}
+              </option>
+            ))}
+          </optgroup>
         </select>
       </label>
+      <button className="btn" aria-pressed={asm.open} onClick={() => asm.setOpen(!asm.open)}>
+        Assembler
+      </button>
       {extra}
       <button className="btn small" onClick={s.clearAll} title="Clear memory, registers and breakpoints">
         Clear all
