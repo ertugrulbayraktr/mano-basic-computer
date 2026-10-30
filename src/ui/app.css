@@ -90,6 +90,10 @@
   border-radius: 4px;
   font-size: 15px;
 }
+.room-menu a > span:last-child {
+  white-space: nowrap;
+  padding-top: 2px;
+}
 .room-menu a:hover {
   color: var(--text);
 }

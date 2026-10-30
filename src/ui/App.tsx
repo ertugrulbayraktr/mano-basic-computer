@@ -1,4 +1,5 @@
-import { HashRouter, Navigate, NavLink, Route, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { HashRouter, Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { BaseSwitch } from './common/controls';
 import { BuildingBlocksRoom } from './rooms/blocks/BuildingBlocksRoom';
 import { AluLabRoom } from './rooms/alu/AluLabRoom';
@@ -11,9 +12,19 @@ const ROOMS = [
   { to: '/computer', no: '03', name: 'Basic Computer', chapters: 'Ch. 5, Ch. 6' },
 ];
 
+/** Opens each section at its top instead of keeping the previous scroll position. */
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 export function App() {
   return (
     <HashRouter>
+      <ScrollToTop />
       <div className="shell">
         <header className="topbar">
           <a href="#/computer" className="brand">
