@@ -134,3 +134,14 @@ describe('assembly example programs run to the expected results', () => {
     expect(sim.history.some((h) => h.text === 'BUN 000 I')).toBe(true);
   });
 });
+
+describe('example texts', () => {
+  it('name the addresses the assembler really gives their symbols', () => {
+    for (const ex of ASM_EXAMPLES) {
+      const symbols = assemble(ex.source).symbols;
+      for (const m of ex.expect.matchAll(/([A-Z]{1,3}) \(address ([0-9A-F]{3})\)/g)) {
+        expect(symbols.get(m[1]), `${ex.id}: ${m[0]}`).toBe(parseInt(m[2], 16));
+      }
+    }
+  });
+});

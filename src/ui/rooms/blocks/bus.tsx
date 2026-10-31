@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { type Bit } from '../../../core/bits';
+import { toBin, type Bit } from '../../../core/bits';
 import { busComponentCounts, clockTransfers, muxBus, triStateBus } from '../../../core/blocks/bus';
 import { BlockHeader, useWord, WidthSelect } from '../../common/blocks';
 import { BitInput, BitToggle, Panel, Ref, Word } from '../../common/controls';
@@ -137,7 +137,7 @@ export function BusBlock() {
           </table>
           {n > bitsShown && <p className="muted" style={{ fontSize: 13 }}>Showing bits 0-{bitsShown - 1} of {n}.</p>}
           <p className="result" style={{ margin: '12px 0 0' }}>
-            Bus = <Word value={m.value} width={n} /> ({NAMES[s]})
+            Bus = {toBin(m.value, n)}, from register {NAMES[s]}
           </p>
           <p className="mono muted" style={{ margin: '6px 0 0' }}>
             Components: {counts.mux.multiplexers} MUXes of {counts.mux.muxSize}
@@ -171,7 +171,7 @@ export function BusBlock() {
             </tbody>
           </table>
           <p className="result" style={{ margin: '12px 0 0' }}>
-            Bus = <Word value={t.value} width={n} /> ({NAMES[s]})
+            Bus = {toBin(t.value, n)}, from register {NAMES[s]}
           </p>
           <p className="mono muted" style={{ margin: '6px 0 0' }}>
             Components: {counts.triState.buffers} buffers + {counts.triState.decoders} decoder ({counts.triState.decoderSize})
@@ -179,7 +179,7 @@ export function BusBlock() {
         </Panel>
       </div>
       <p className="notice" style={{ margin: 0 }}>
-        Same select value, same result: {m.value === t.value ? 'both buses carry' : 'MISMATCH'} <Word value={m.value} width={n} />.
+        Same select value, same result: {m.value === t.value ? 'both buses carry' : 'MISMATCH'} {toBin(m.value, n)}.
       </p>
     </>
   );

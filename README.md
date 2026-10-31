@@ -7,6 +7,9 @@ which path every signal takes through them.
 Everything follows Mano's notation: register names, bus select numbers, RTL such as `M[AR]`,
 timing signals T0…T15, the control equations of Sec. 5-10, and figure and table numbers.
 
+Reading the drawings: a **green** wire carries 1 or an active control signal (the convention of
+logic simulators); a **yellow highlight** marks a value that changed on the clock edge.
+
 ![The Basic Computer circuit during the data-flow sub-step of D1T4 (ADD 205)](docs/screenshots/basic-computer.jpg)
 
 ## Basic Computer (Ch. 5–6)

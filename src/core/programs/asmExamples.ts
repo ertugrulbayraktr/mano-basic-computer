@@ -45,7 +45,7 @@ SUB,    DEC 23      / subtrahend
 DIF,    HEX 0       / the difference goes here
         END
 `,
-    expect: 'DIF (address 109) = 003C, decimal 60.',
+    expect: 'DIF (address 108) = 003C, decimal 60.',
   },
   {
     id: 'asm-or',
@@ -69,7 +69,7 @@ TMP,    HEX 0
 C,      HEX 0
         END
 `,
-    expect: 'C (address 10D) = 0FFF = 0F0F OR 00FF.',
+    expect: 'C (address 10C) = 0FFF = 0F0F OR 00FF.',
   },
   {
     id: 'asm-io',
