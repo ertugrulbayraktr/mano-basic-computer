@@ -6,40 +6,6 @@ import { Ref, Word } from '../../common/controls';
 import { useSettings } from '../../settings';
 import { useComputer, useSim } from './store';
 
-export function HistoryPanel() {
-  const sim = useSim();
-  const list = useRef<HTMLOListElement>(null);
-  useEffect(() => {
-    list.current?.lastElementChild?.scrollIntoView({ block: 'nearest' });
-  }, [sim.history.length]);
-  return (
-    <section className="panel" aria-label="Instruction history">
-      <div className="panel-head">
-        <span className="cap">Instruction history</span>
-        <span className="cap">{sim.history.length} so far</span>
-      </div>
-      {sim.history.length === 0 ? (
-        <p className="muted" style={{ margin: 0 }}>No instruction has started yet.</p>
-      ) : (
-        <ol className="history" ref={list}>
-          {sim.history.map((h, i) => {
-            const current = i === sim.history.length - 1 && sim.state.SC !== 0;
-            return (
-              <li key={i} className={current ? 'current' : ''}>
-                <span className="muted">#{i + 1}</span>
-                <Word value={h.address} width={12} />
-                <span>{h.kind === 'interrupt' ? '—' : <Word value={h.word} width={16} />}</span>
-                <span style={{ color: h.kind === 'interrupt' ? 'var(--changed)' : 'var(--text)' }}>{h.text}</span>
-                <span className="muted">{current ? `T${sim.state.SC}…` : `p${h.pulse}`}</span>
-              </li>
-            );
-          })}
-        </ol>
-      )}
-    </section>
-  );
-}
-
 export function IODevices() {
   const sim = useSim();
   const pressKey = useComputer((s) => s.pressKey);
