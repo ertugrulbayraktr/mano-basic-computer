@@ -1,33 +1,50 @@
 # Mano Basic Computer — Interactive Learning Simulator
 
-A web app that shows, **clock pulse by clock pulse**, how the Basic Computer of M. Morris Mano's
-*Computer System Architecture* (3rd edition, Chapter 5) works, together with the building blocks
-it is made of (Chapters 2–4) and an assembler for its language (Chapter 6).
+A web app that draws the **circuits** of the Basic Computer and the ALU from M. Morris Mano's
+*Computer System Architecture* (3rd edition) and lets you watch, **clock pulse by clock pulse**,
+which path every signal takes through them.
 
 Everything follows Mano's notation: register names, bus select numbers, RTL such as `M[AR]`,
-timing signals T0…T15, and figure and table numbers, which are shown next to each part of the UI.
+timing signals T0…T15, the control equations of Sec. 5-10, and figure and table numbers.
 
-![Basic Computer room: the D1T4 pulse of ADD 205](docs/screenshots/basic-computer.jpg)
+![The Basic Computer circuit during the data-flow sub-step of D1T4 (ADD 205)](docs/screenshots/basic-computer.jpg)
 
-## Three rooms
+## Basic Computer (Ch. 5–6)
 
-| Room | Book | What you can do |
-|---|---|---|
-| **01 Building Blocks** | Ch. 1–2, Sec. 4-1 to 4-3 | Toggle inputs of gates (and NOR-only constructions), half/full adders, a ripple-carry adder, decoder, encoder, MUX, clocked register, shift register, counter and memory. Compare the MUX bus and the three-state bus side by side. Watch `R2 ← R1, R1 ← R2` swap on one clock edge. |
-| **02 ALU Lab** | Sec. 4-4 to 4-7, 8-7 | Adder-subtractor with C vs. V guidance, incrementer, arithmetic circuit (Table 4-4), logic circuit, all 16 logic functions and their applications, shifts with `ashl` overflow, the combinational shifter, the full ALU of Fig. 4-13 showing every candidate result, and the status bits C, S, Z, V. |
-| **03 Basic Computer** | Ch. 5, Ch. 6 | Step one pulse or one instruction, run with adjustable speed, **step back** through the whole history, edit any register, flip-flop or memory word, set breakpoints, type on the keyboard and read the printer, write and assemble programs. |
+One zoomable circuit: the control unit of Fig. 5-6 (IR, the 3 × 8 and 4 × 16 decoders, SC,
+flip-flops and the control logic gates), the bus select encoder of Table 5-7, the common bus
+and the registers of Fig. 5-4, the memory and the adder-and-logic circuit of Fig. 5-21.
 
-![ALU Lab: Fig. 4-13 with all candidate results](docs/screenshots/alu-lab.jpg)
-![Building Blocks: MUX bus vs. three-state bus](docs/screenshots/building-blocks-bus.jpg)
+Every clock pulse is shown in **four sub-steps**, in the order the hardware settles:
 
-### At every clock pulse Room 3 shows
+1. **Timing and decode**: SC drives the 4 × 16 decoder (T0…T15); IR(12-14) drives the 3 × 8 decoder (D0…D7).
+2. **Control gates**: the AND gates whose term is 1 (e.g. `D1T4`) light up, wired from the T and D lines to the control outputs they raise (`LD(DR)`, `Read`, `x7`).
+3. **Data flow**: the encoder sets S2S1S0, the source drives the bus, and the value travels to the inputs of the registers that will load it.
+4. **Clock edge**: every enabled register and flip-flop stores its new value at the same instant.
 
-- the active timing signal, SC, the decoder output D0…D7 and the flip-flops I, S, E, R, IEN, FGI, FGO;
-- the executed lines of **Table 5-6** with their control functions, e.g. `D1T5: AC ← AC + DR, E ← Cout, SC ← 0`;
-- the control signals: bus select S2S1S0 and its source, the bus value, LD/INR/CLR of every register, memory read/write and the inputs of the AC adder-and-logic circuit (Fig. 5-21);
-- before/after values of everything that changed, on the datapath of Fig. 5-4;
-- the memory with PC and AR marked and every word disassembled (`1205 → ADD 205`, `9300 → ADD 300 I`, `7020 → INC`);
-- a plain-language **"What happened?"** explanation and the instruction history.
+A side panel explains each sub-step in plain language and shows the Table 5-6 line. Click the
+control logic for every equation of Sec. 5-10 with the active terms lit, or the adder-and-logic
+block for one stage of Fig. 5-21. You can also step back through the whole history, run at
+adjustable speed, edit memory, set breakpoints, type on the keyboard, read the printer, and write
+and assemble programs (Ch. 6).
+
+## ALU (Fig. 4-13)
+
+All four stages of the arithmetic logic shift unit, each with its Y multiplexer and full adder,
+its logic gates and multiplexer, and its output multiplexer; shared select lines; the carry chain.
+Choose A, B, S3S2S1S0 and Cin (or click a row of Table 4-8) and step through the propagation:
+Y multiplexers → full adder 0, 1, 2, 3 as the carry ripples → logic stage → output multiplexers → C, S, Z, V.
+Wires show their value once it has settled. Both encodings of the arithmetic rows are available
+(Table 4-8 as printed, or the Fig. 4-9 wiring of Table 4-4).
+
+![The ALU circuit while the carry ripples into stage 2](docs/screenshots/alu-circuit.jpg)
+
+## More
+
+- **Building blocks** (Ch. 1–2, Sec. 4-1 to 4-3): gates and NOR-only constructions, adders, decoder, encoder, MUX, clocked registers, shift register, counter, memory, the MUX bus vs. the three-state bus, register transfer.
+- **ALU lab** (Sec. 4-4 to 4-7, 8-7): each part of the ALU on its own, with 4, 8 or 16 bits, the 16 logic functions and their applications, all shift microoperations.
+
+![Building blocks: MUX bus vs. three-state bus](docs/screenshots/building-blocks-bus.jpg)
 
 ### Example programs
 
@@ -53,27 +70,37 @@ Requires Node.js 20 or newer.
 ```bash
 npm install
 npm run dev       # http://localhost:5173/mano-basic-computer/
-npm test          # Vitest: every instruction at pulse granularity, ALU, assembler, examples
+npm test          # Vitest: every instruction at pulse granularity, control gates, ALU, assembler
 npm run build     # type-check and production build into dist/
 ```
 
 ## Architecture
 
 ```
-src/core/          pure TypeScript, no React or DOM: fully unit-tested
-  bits.ts          word helpers and formatting
-  blocks/          gates, adders, decoder, MUX, registers, memory, buses   (Room 1)
-  alu/             arithmetic, logic, shift circuits, ALU, status bits     (Room 2)
-  basic/           control unit (control.ts), one clock edge (pulse.ts),
-                   Fig. 5-21 circuit, disassembler, explanations, Simulator
-  assembler/       two-pass assembler (Ch. 6)
-  programs/        example programs 1-11
-src/ui/            React + Zustand; SVG diagrams; hash routing per room
+src/core/            pure TypeScript, no React or DOM: fully unit-tested
+  bits.ts            word helpers and formatting
+  blocks/            gates, adders, decoder, MUX, registers, memory, buses
+  alu/               arithmetic, logic, shift circuits, ALU, status bits;
+                     aluSteps.ts: per-stage signals and propagation order of Fig. 4-13
+  basic/             control unit (control.ts), one clock edge (pulse.ts),
+                     controlLogic.ts: the control gate equations of Sec. 5-10,
+                     microsteps.ts: a pulse split into its four sub-steps,
+                     Fig. 5-21 circuit, disassembler, explanations, Simulator
+  assembler/         two-pass assembler (Ch. 6)
+  programs/          example programs 1-11
+src/ui/
+  circuit/           SVG circuit toolkit: pan/zoom canvas, wires, gates, MUX, blocks, pins
+  rooms/computer/    Basic Computer circuit page
+  rooms/alu/         ALU circuit page and ALU lab sections
+  rooms/blocks/      building blocks
 ```
 
 `controlSignals()` derives every control signal of a pulse from the state *before* the pulse, as
-the hardware does; `pulse()` then applies all of them at once on the clock edge. The `Simulator`
-class adds undo of every pulse, breakpoints, instruction history and the keyboard/printer devices.
+the hardware does; `pulse()` then applies all of them at once on the clock edge. The gate
+equations in `controlLogic.ts` are what the drawing shows; a test checks over thousands of states
+and every example program that they produce exactly the same signals as `controlSignals()`.
+The `Simulator` class adds undo of every pulse, breakpoints, instruction history and the
+keyboard/printer devices.
 
 User programs and settings are stored in the browser's local storage.
 
