@@ -36,6 +36,8 @@ interface UndoEntry {
   lastTrace: PulseTrace | null;
   pulses: number;
   historyLength: number;
+  /** Performs the undone action again, for redo. */
+  redo: () => void;
 }
 
 export type StopReason = 'halted' | 'breakpoint' | 'limit';
@@ -45,11 +47,14 @@ export interface SimulatorOptions {
   printerDelay?: number;
   /** Maximum number of undo steps kept. */
   undoLimit?: number;
+  /** Maximum number of pulse traces kept for the timing diagram. */
+  timelineLimit?: number;
 }
 
 /**
- * Stateful wrapper around `pulse()` that adds what a user of the simulator needs: undo of every
- * step, instruction history, breakpoints, direct edits, and the keyboard and printer devices.
+ * Stateful wrapper around `pulse()` that adds what a user of the simulator needs: undo and redo of
+ * every step and edit, a timeline of pulse traces, instruction history, breakpoints, direct
+ * edits, and the keyboard and printer devices.
  */
 export class Simulator {
   state: MachineState = initialState();
@@ -58,18 +63,39 @@ export class Simulator {
   history: InstructionRecord[] = [];
   lastTrace: PulseTrace | null = null;
   pulses = 0;
+  /** Traces of the most recent pulses; timeline[i] is pulse number timelineStart + i + 1. */
+  timeline: PulseTrace[] = [];
   printerDelay: number;
   private undoStack: UndoEntry[] = [];
+  private redoStack: (() => void)[] = [];
+  private replaying = false;
   private readonly undoLimit: number;
+  private readonly timelineLimit: number;
 
   constructor(opts: SimulatorOptions = {}) {
     this.printerDelay = Math.max(1, opts.printerDelay ?? 20);
     this.undoLimit = opts.undoLimit ?? 200_000;
+    this.timelineLimit = opts.timelineLimit ?? 4000;
   }
 
   get canStepBack(): boolean {
     return this.undoStack.length > 0;
   }
+
+  get canRedo(): boolean {
+    return this.redoStack.length > 0;
+  }
+
+  /** Pulse number of the first trace still in the timeline, minus one. */
+  get timelineStart(): number {
+    return this.pulses - this.timeline.length;
+  }
+
+  /** The furthest pulse that redo can reach from here. */
+  get latestPulse(): number {
+    return this.pulses + this.redoPulseCount;
+  }
+  private redoPulseCount = 0;
 
   get halted(): boolean {
     return !this.state.flag.S;
@@ -83,7 +109,10 @@ export class Simulator {
     this.history = [];
     this.lastTrace = null;
     this.pulses = 0;
+    this.timeline = [];
     this.undoStack = [];
+    this.redoStack = [];
+    this.redoPulseCount = 0;
   }
 
   /** Loads words into memory and sets PC. Clears the undo history (a new program starts). */
@@ -101,7 +130,8 @@ export class Simulator {
       this.lastTrace = trace;
       return trace;
     }
-    const entry = this.snapshot();
+    this.newAction();
+    const entry = this.snapshot(() => this.step());
 
     if (before.SC === 0) this.recordInstructionStart(before);
 
@@ -113,6 +143,8 @@ export class Simulator {
     this.pushUndo(entry);
     this.pulses++;
     this.lastTrace = trace;
+    this.timeline.push(trace);
+    if (this.timeline.length > this.timelineLimit) this.timeline.shift();
     return trace;
   }
 
@@ -144,10 +176,16 @@ export class Simulator {
     return s.SC === 0 && !s.flag.R && this.breakpoints.has(s.reg.PC);
   }
 
-  /** Undoes the last pulse or edit. */
+  /** Undoes the last pulse or edit. It can be done again with `redo()`. */
   stepBack(): boolean {
     const e = this.undoStack.pop();
     if (!e) return false;
+    if (e.pulses !== this.pulses) {
+      // The entry was a pulse: drop its trace from the timeline.
+      this.timeline.pop();
+      this.redoPulseCount++;
+    }
+    this.redoStack.push(e.redo);
     const mem = this.state.mem.slice();
     for (let i = e.mem.length - 1; i >= 0; i--) mem[e.mem[i][0]] = e.mem[i][1];
     this.state = { reg: e.reg, flag: e.flag, SC: e.SC, mem };
@@ -158,26 +196,53 @@ export class Simulator {
     return true;
   }
 
+  /** Redoes the last undone pulse or edit. */
+  redo(): boolean {
+    const action = this.redoStack.pop();
+    if (!action) return false;
+    const before = this.pulses;
+    this.replaying = true;
+    try {
+      action();
+    } finally {
+      this.replaying = false;
+    }
+    if (this.pulses !== before) this.redoPulseCount--;
+    return true;
+  }
+
+  /**
+   * Moves through history to just after pulse `target` (0 = before the first pulse), undoing or
+   * redoing pulses and edits. Edits made at a pulse stay applied when seeking to that pulse.
+   */
+  seek(target: number): void {
+    while (this.pulses > target && this.stepBack());
+    while (this.pulses < target && this.redo());
+  }
+
   // ---- direct edits (each one can be undone) ----
 
   setRegister(r: RegName, value: number): void {
-    this.edit(() => (this.state.reg[r] = trunc(value, REG_WIDTH[r])));
+    this.edit(() => (this.state.reg[r] = trunc(value, REG_WIDTH[r])), () => this.setRegister(r, value));
   }
 
   setFlag(f: FlagName, value: Bit): void {
-    this.edit(() => (this.state.flag[f] = value));
+    this.edit(() => (this.state.flag[f] = value), () => this.setFlag(f, value));
   }
 
   setSC(value: number): void {
-    this.edit(() => (this.state.SC = trunc(value, 4)));
+    this.edit(() => (this.state.SC = trunc(value, 4)), () => this.setSC(value));
   }
 
   setMemory(address: number, value: number): void {
     const a = address & 0xfff;
-    this.edit((entry) => {
-      entry.mem.push([a, this.state.mem[a]]);
-      this.state.mem[a] = value & 0xffff;
-    });
+    this.edit(
+      (entry) => {
+        entry.mem.push([a, this.state.mem[a]]);
+        this.state.mem[a] = value & 0xffff;
+      },
+      () => this.setMemory(address, value),
+    );
   }
 
   // ---- devices ----
@@ -189,10 +254,13 @@ export class Simulator {
   pressKey(char: string): boolean {
     if (this.state.flag.FGI) return false;
     const code = char.charCodeAt(0) & 0xff;
-    this.edit(() => {
-      this.state.reg.INPR = code;
-      this.state.flag.FGI = 1;
-    });
+    this.edit(
+      () => {
+        this.state.reg.INPR = code;
+        this.state.flag.FGI = 1;
+      },
+      () => this.pressKey(char),
+    );
     return true;
   }
 
@@ -230,7 +298,14 @@ export class Simulator {
     }
   }
 
-  private snapshot(): UndoEntry {
+  /** A new step or edit (not a redo) makes the undone future unreachable. */
+  private newAction(): void {
+    if (this.replaying) return;
+    this.redoStack = [];
+    this.redoPulseCount = 0;
+  }
+
+  private snapshot(redo: () => void): UndoEntry {
     return {
       reg: { ...this.state.reg },
       flag: { ...this.state.flag },
@@ -240,11 +315,13 @@ export class Simulator {
       lastTrace: this.lastTrace,
       pulses: this.pulses,
       historyLength: this.history.length,
+      redo,
     };
   }
 
-  private edit(apply: (entry: UndoEntry) => void): void {
-    const entry = this.snapshot();
+  private edit(apply: (entry: UndoEntry) => void, redo: () => void): void {
+    this.newAction();
+    const entry = this.snapshot(redo);
     this.state = { ...this.state, reg: { ...this.state.reg }, flag: { ...this.state.flag } };
     apply(entry);
     this.pushUndo(entry);
