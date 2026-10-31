@@ -69,7 +69,10 @@
   background: var(--rule);
   margin: 16px 2px;
 }
-.topbar > .base-switch {
+.topbar-switches {
+  display: flex;
+  gap: 8px;
+  align-items: center;
   align-self: center;
 }
 

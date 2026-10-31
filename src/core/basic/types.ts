@@ -72,3 +72,24 @@ export function initialState(): MachineState {
 export function cloneState(s: MachineState): MachineState {
   return { reg: { ...s.reg }, flag: { ...s.flag }, SC: s.SC, mem: s.mem.slice() };
 }
+
+export const REG_TITLE_TR: Record<RegName, string> = {
+  DR: 'Veri yazmacı',
+  AR: 'Adres yazmacı',
+  AC: 'Akümülatör',
+  IR: 'Komut yazmacı',
+  PC: 'Program sayacı',
+  TR: 'Geçici yazmaç',
+  INPR: 'Giriş yazmacı',
+  OUTR: 'Çıkış yazmacı',
+};
+
+export const FLAG_TITLE_TR: Record<FlagName, string> = {
+  I: 'Adresleme modu (dolaylı)',
+  S: 'Başlat-durdur',
+  E: 'Genişletilmiş AC biti (elde)',
+  R: 'Kesme',
+  IEN: 'Kesme etkinleştirme',
+  FGI: 'Giriş bayrağı',
+  FGO: 'Çıkış bayrağı',
+};

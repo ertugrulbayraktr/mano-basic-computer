@@ -1,8 +1,15 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
 import type { PulseTrace } from '../../core/basic/pulse';
 import { instructionBand, LANE_BY_ID, LANES, type Lane } from '../../core/basic/waveforms';
-import { useSettings } from '../settings';
+import { useLang, useSettings } from '../settings';
 import { useComputer, useSim } from '../rooms/computer/store';
+
+const GROUP_TR: Record<string, string> = {
+  Timing: 'Zamanlama',
+  'Flip-flops': "Flip-flop'lar",
+  'Bus and memory': 'Ortak yol ve bellek',
+  Registers: 'Yazmaçlar',
+};
 
 const PW = 34; // width of one pulse
 const ROW = 22;
@@ -17,6 +24,8 @@ export function TimingDiagram() {
   const sub = useComputer((s) => s.sub);
   const seek = useComputer((s) => s.seek);
   const { lanes, setLanes } = useSettings();
+  const { lang, L } = useLang();
+  const group = (g: string) => (lang === 'tr' ? (GROUP_TR[g] ?? g.replace('Control: ', 'Kontrol: ')) : g);
   const scroller = useRef<HTMLDivElement>(null);
   const [scroll, setScroll] = useState({ left: 0, width: 800 });
   const dragging = useRef(false);
@@ -67,34 +76,34 @@ export function TimingDiagram() {
   const laneTop = (k: number) => y(3 + k);
 
   return (
-    <div className="timing" aria-label="Timing diagram">
+    <div className="timing" aria-label={L('Timing diagram', 'Zamanlama diyagramı')}>
       <div className="timing-labels" style={{ width: LABEL_W }}>
         <div className="tl-label muted" style={{ height: ROW, marginTop: 3 }}>
-          Pulse
+          {L('Pulse', 'Darbe')}
         </div>
         <div className="tl-label muted" style={{ height: ROW }}>
-          Instruction
+          {L('Instruction', 'Komut')}
         </div>
         <div className="tl-label" style={{ height: ROW }}>
-          Clock
+          {L('Clock', 'Saat')}
         </div>
         {shown.map((l) => (
           <div key={l.id} className="tl-label" style={{ height: ROW }}>
             <span className="mono">{l.label}</span>
-            <button className="tl-remove" aria-label={`Remove lane ${l.label}`} onClick={() => setLanes(lanes.filter((x) => x !== l.id))}>
+            <button className="tl-remove" aria-label={L(`Remove lane ${l.label}`, `${l.label} şeridini kaldır`)} onClick={() => setLanes(lanes.filter((x) => x !== l.id))}>
               ×
             </button>
           </div>
         ))}
         <select
           className="tl-add"
-          aria-label="Add a lane"
+          aria-label={L('Add a lane', 'Şerit ekle')}
           value=""
           onChange={(e) => e.target.value && setLanes([...lanes, e.target.value])}
         >
-          <option value="">Add a signal…</option>
+          <option value="">{L('Add a signal…', 'Sinyal ekle…')}</option>
           {[...new Set(LANES.map((l) => l.group))].map((g) => (
-            <optgroup key={g} label={g}>
+            <optgroup key={g} label={group(g)}>
               {LANES.filter((l) => l.group === g && !lanes.includes(l.id)).map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.label}
@@ -112,7 +121,7 @@ export function TimingDiagram() {
           className="timing-svg"
           role="slider"
           tabIndex={0}
-          aria-label="Time: drag or use the arrow keys to move through the pulses"
+          aria-label={L('Time: drag or use the arrow keys to move through the pulses', 'Zaman: darbeler arasında gezinmek için sürükle ya da ok tuşlarını kullan')}
           aria-valuemin={start}
           aria-valuemax={start + total}
           aria-valuenow={sim.pulses}
@@ -141,7 +150,7 @@ export function TimingDiagram() {
               fill={i === cur ? 'var(--paper-2)' : i % 2 ? '#fbfbfc' : 'transparent'}
               opacity={i >= pastCount ? 0.6 : 1}
             >
-              <title>{`Pulse ${start + i + 1}, T${t.before.SC}\n${t.signals.lines.map((l) => `${l.control}: ${l.statement}`).join('\n') || 'no microoperation'}`}</title>
+              <title>{`${L('Pulse', 'Darbe')} ${start + i + 1}, T${t.before.SC}\n${t.signals.lines.map((l) => `${l.control}: ${l.statement}`).join('\n') || L('no microoperation', 'mikroişlem yok')}`}</title>
             </rect>
           ))}
 

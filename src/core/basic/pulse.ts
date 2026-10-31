@@ -1,4 +1,5 @@
 import { trunc, type Bit } from '../bits';
+import { msg, type Msg } from '../i18n';
 import { clockRegister } from '../blocks/sequential';
 import { adderLogicPath, type AcPathResult } from './adderLogic';
 import { controlSignals, type ControlSignals } from './control';
@@ -37,7 +38,7 @@ export interface PulseTrace {
   acPaths: AcPathResult[];
   changes: Change[];
   memory: MemoryChange[];
-  notices: string[];
+  notices: Msg[];
 }
 
 /** Value placed on the common bus for a select value (Fig. 5-4). 12-bit sources are zero-extended. */
@@ -78,15 +79,17 @@ export function pulse(s: MachineState): { next: MachineState; trace: PulseTrace 
     const acInput = acPaths.reduce((acc, p) => acc | p.ac, 0);
     if (acPaths.length > 1) {
       notices.push(
-        `Several inputs of the AC logic circuit are enabled (${c.acOps.join(', ')}); ` +
-          'their outputs are ORed into AC.',
+        msg(
+          `Several inputs of the AC logic circuit are enabled (${c.acOps.join(', ')}); their outputs are ORed into AC.`,
+          `AC mantık devresinin birden fazla girişi etkin (${c.acOps.join(', ')}); çıkışları VEYA'lanarak AC'ye girer.`,
+        ),
       );
     }
 
     for (const r of REGISTERS) {
       const ctl = c.reg[r];
       if ([ctl.clr, ctl.ld, ctl.inr].filter(Boolean).length > 1) {
-        notices.push(`${r} receives more than one of CLR, LD, INR; priority is CLR, LD, INR (Table 2-4).`);
+        notices.push(msg(`${r} receives more than one of CLR, LD, INR; priority is CLR, LD, INR (Table 2-4).`, `${r} aynı anda CLR, LD, INR'den birden fazlasını alıyor; öncelik CLR, LD, INR sırasıdır (Tablo 2-4).`));
       }
       const input = r === 'AC' ? acInput : (bus ?? 0);
       next.reg[r] = clockRegister(s.reg[r], REG_WIDTH[r], ctl, input);
@@ -95,7 +98,7 @@ export function pulse(s: MachineState): { next: MachineState; trace: PulseTrace 
     // E flip-flop: cleared, complemented or loaded from the circuit (carry or circulated bit).
     const eSources = acPaths.filter((p) => p.e !== undefined).map((p) => p.e as Bit);
     const eActions = [c.e.clr, c.e.com, c.e.load].filter(Boolean).length;
-    if (eActions > 1) notices.push('E receives more than one operation; priority is clear, load, complement.');
+    if (eActions > 1) notices.push(msg('E receives more than one operation; priority is clear, load, complement.', 'E birden fazla işlem alıyor; öncelik temizle, yükle, tümle sırasıdır.'));
     if (c.e.clr) next.flag.E = 0;
     else if (c.e.load) next.flag.E = eSources.reduce<number>((a, b) => a | b, 0) as Bit;
     else if (c.e.com) next.flag.E = (s.flag.E ^ 1) as Bit;
@@ -120,7 +123,7 @@ export function pulse(s: MachineState): { next: MachineState; trace: PulseTrace 
     };
   }
 
-  notices.push('S = 0: the computer is halted and the clock does not advance.');
+  notices.push(msg('S = 0: the computer is halted and the clock does not advance.', 'S = 0: bilgisayar durdu ve saat ilerlemiyor.'));
   return {
     next,
     trace: { before: { reg: s.reg, flag: s.flag, SC: s.SC }, signals: c, busSource: 'none', busValue: null, acPaths: [], changes: [], memory, notices },

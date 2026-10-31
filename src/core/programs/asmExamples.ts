@@ -5,17 +5,22 @@ import type { FlagName } from '../basic/types';
 export interface AsmExample {
   id: string;
   title: string;
+  /** Turkish title. */
+  titleTr: string;
   reference: string;
   source: string;
   /** Flip-flop values different from reset, applied after loading. */
   flag?: Partial<Record<FlagName, Bit>>;
   expect: string;
+  /** Turkish version of `expect`. */
+  expectTr: string;
 }
 
 export const ASM_EXAMPLES: AsmExample[] = [
   {
     id: 'asm-add',
     title: '7. Add two numbers',
+    titleTr: '7. İki sayıyı topla',
     reference: 'Sec. 6-2',
     source: `        ORG 100
         LDA A       / load first operand into AC
@@ -28,10 +33,12 @@ C,      DEC 0       / the sum goes here
         END
 `,
     expect: 'C (address 106) = 003C, decimal 60.',
+    expectTr: 'C (adres 106) = 003C, onluk 60.',
   },
   {
     id: 'asm-sub',
     title: '8. Subtract two numbers',
+    titleTr: '8. İki sayıyı çıkar',
     reference: 'Sec. 6-4',
     source: `        ORG 100
         LDA SUB     / load the subtrahend
@@ -46,10 +53,12 @@ DIF,    HEX 0       / the difference goes here
         END
 `,
     expect: 'DIF (address 108) = 003C, decimal 60.',
+    expectTr: 'DIF (adres 108) = 003C, onluk 60.',
   },
   {
     id: 'asm-or',
     title: '9. OR with De Morgan',
+    titleTr: '9. De Morgan ile OR',
     reference: 'Sec. 6-4',
     source: `/ The Basic Computer has AND but no OR.
 / De Morgan: A OR B = (A' AND B')'
@@ -70,10 +79,12 @@ C,      HEX 0
         END
 `,
     expect: 'C (address 10C) = 0FFF = 0F0F OR 00FF.',
+    expectTr: 'C (adres 10C) = 0FFF = 0F0F OR 00FF.',
   },
   {
     id: 'asm-io',
     title: '10. Echo input to output',
+    titleTr: '10. Girişi çıkışa yansıt',
     reference: 'Sec. 6-8',
     source: `/ Program-controlled I/O: wait for a key,
 / then wait for the printer and print it.
@@ -88,10 +99,12 @@ COF,    SKO         / is the printer ready (FGO = 1)?
         END
 `,
     expect: 'Run it, then type in the keyboard box: every character appears on the printer. It never halts; press Pause.',
+    expectTr: "Çalıştır, sonra klavye kutusuna yaz: her karakter yazıcıda görünür. Program durmaz; Duraklat'a bas.",
   },
   {
     id: 'asm-interrupt',
     title: '11. Interrupt-driven input',
+    titleTr: '11. Kesmeyle giriş',
     reference: 'Fig. 5-13, Sec. 6-8',
     source: `/ The main program counts in AC forever.
 / A key press interrupts it; the service routine
@@ -126,5 +139,6 @@ PTR,    HEX 200     / buffer pointer
     flag: { FGO: 0 },
     expect:
       'Run it and type a key. At the end of the current instruction R = 1; the interrupt cycle saves PC in M[0] and jumps to 1. The character is stored at 200, 201, … FGO starts at 0 (no printer attached) so only the keyboard interrupts.',
+    expectTr: "Çalıştır ve bir tuşa bas. Mevcut komutun sonunda R = 1 olur; kesme çevrimi PC'yi M[0]'a kaydeder ve 1'e dallanır. Karakter 200, 201, … adreslerine saklanır. FGO 0 ile başlar (yazıcı bağlı değil), bu yüzden yalnızca klavye kesme üretir.",
   },
 ];

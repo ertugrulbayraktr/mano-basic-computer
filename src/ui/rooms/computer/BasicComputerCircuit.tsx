@@ -6,7 +6,7 @@ import type { EditTarget } from './RegistersPanel';
 import { CircuitCanvas, type Rect } from '../../circuit/CircuitCanvas';
 import { Block, Dot, Gate, Pin, Text, Wire } from '../../circuit/parts';
 import { fmt } from '../../common/format';
-import { useSettings } from '../../settings';
+import { useLang, useSettings } from '../../settings';
 
 /**
  * The Basic Computer drawn as one circuit: the control unit of Fig. 5-6 on the left (IR, the
@@ -188,6 +188,7 @@ export function BasicComputerCircuit({
   usage?: Map<string, number> | null;
 }) {
   const { base } = useSettings();
+  const { L } = useLang();
   const t = view?.trace ?? null;
   const live = !!view && t?.signals.phase !== 'halted';
   const s1 = live && sub >= 1;
@@ -207,14 +208,14 @@ export function BasicComputerCircuit({
   const busOn = s2 && t?.busSource !== 'none';
 
   return (
-    <CircuitCanvas width={W} height={H} label="Basic Computer circuit: control unit, bus and registers" focus={follow ? focusRect(view, sub) : null}>
+    <CircuitCanvas width={W} height={H} label={L('Basic Computer circuit: control unit, bus and registers', 'Temel Bilgisayar devresi: kontrol birimi, ortak yol ve yazmaçlar')} focus={follow ? focusRect(view, sub) : null}>
       {/* ---------------- Control unit ---------------- */}
       <Text at={[30, 14]} size={12.5} weight={600} tone="muted">
-        Control unit (Fig. 5-6)
+        {L('Control unit (Fig. 5-6)', 'Kontrol birimi (Şekil 5-6)')}
       </Text>
 
       {/* IR as seen by the control unit. */}
-      <Block x={IRV.x} y={IRV.y} w={IRV.w} h={IRV.h} dashed title="Instruction register (the same IR as on the bus)">
+      <Block x={IRV.x} y={IRV.y} w={IRV.w} h={IRV.h} dashed title={L('Instruction register (the same IR as on the bus)', 'Komut yazmacı (ortak yoldaki IR ile aynı)')}>
         <Text at={[IRV.x + 10, IRV.y + 16]} size={12.5} tone="muted">
           IR
         </Text>
@@ -242,7 +243,7 @@ export function BasicComputerCircuit({
           3 × 8
         </Text>
         <Text at={[DEC3.x + DEC3.w / 2, DEC3.y + DEC3.h / 2 + 6]} size={11.5} anchor="middle" tone="muted">
-          decoder
+          {L('decoder', 'kod çözücü')}
         </Text>
       </Block>
       {Array.from({ length: 8 }, (_, i) => (
@@ -255,7 +256,7 @@ export function BasicComputerCircuit({
       ))}
 
       {/* I flip-flop */}
-      <Block x={IFF.x} y={IFF.y} w={IFF.w} h={IFF.h} on={live && shown.flag.I === 1} title="I flip-flop: addressing mode. Click to edit." onClick={() => onEdit('I')}>
+      <Block x={IFF.x} y={IFF.y} w={IFF.w} h={IFF.h} on={live && shown.flag.I === 1} title={L('I flip-flop: addressing mode. Click to edit.', 'I flip-flop\'u: adresleme modu. Düzenlemek için tıkla.')} onClick={() => onEdit('I')}>
         <Text at={[IFF.x + 10, IFF.y + IFF.h / 2]} size={12} weight={600}>
           I
         </Text>
@@ -266,7 +267,7 @@ export function BasicComputerCircuit({
       <Wire points={[[IFF.x + IFF.w, IFF.y + IFF.h / 2], [CL.x, IFF.y + IFF.h / 2]]} on={live && shown.flag.I === 1} />
 
       {/* Sequence counter */}
-      <Block x={SCB.x} y={SCB.y} w={SCB.w} h={SCB.h} on={live} changed={changed('SC')} title="Sequence counter SC (4 bits). Click to edit." onClick={() => onEdit('SC')}>
+      <Block x={SCB.x} y={SCB.y} w={SCB.w} h={SCB.h} on={live} changed={changed('SC')} title={L('Sequence counter SC (4 bits). Click to edit.', 'Sıra sayıcı SC (4 bit). Düzenlemek için tıkla.')} onClick={() => onEdit('SC')}>
         <Text at={[SCB.x + 10, SCB.y + 18]} size={12.5} tone="muted">
           SC
         </Text>
@@ -287,7 +288,7 @@ export function BasicComputerCircuit({
           4 × 16
         </Text>
         <Text at={[DEC4.x + DEC4.w / 2, DEC4.y + DEC4.h / 2 + 6]} size={11.5} anchor="middle" tone="muted">
-          decoder
+          {L('decoder', 'kod çözücü')}
         </Text>
       </Block>
       {Array.from({ length: 16 }, (_, i) => (
@@ -304,7 +305,7 @@ export function BasicComputerCircuit({
         const on = live && shown.flag[f] === 1;
         return (
           <g key={f}>
-            <Block x={DEC4.x - 10} y={ffY(i)} w={70} h={30} on={on} changed={changed(f)} title={`${f} flip-flop. Click to edit.`} onClick={() => onEdit(f)}>
+            <Block x={DEC4.x - 10} y={ffY(i)} w={70} h={30} on={on} changed={changed(f)} title={L(`${f} flip-flop. Click to edit.`, `${f} flip-flop'u. Düzenlemek için tıkla.`)} onClick={() => onEdit(f)}>
               <Text at={[DEC4.x, ffY(i) + 15]} size={12.5} weight={600}>
                 {f}
               </Text>
@@ -321,12 +322,12 @@ export function BasicComputerCircuit({
       <ControlGates view={view} sub={sub} live={live} onOpen={onOpenGates} />
 
       {/* ---------------- Bus select encoder (Table 5-7) ---------------- */}
-      <Block x={ENC.x} y={ENC.y} w={ENC.w} h={ENC.h} on={s2 && busOn} title="Bus select encoder (Table 5-7)">
+      <Block x={ENC.x} y={ENC.y} w={ENC.w} h={ENC.h} on={s2 && busOn} title={L('Bus select encoder (Table 5-7)', 'Yol seçim kodlayıcısı (Tablo 5-7)')}>
         <Text at={[ENC.x + ENC.w / 2, ENC.y + ENC.h / 2 - 8]} size={11.5} anchor="middle" tone="muted">
-          encoder
+          {L('encoder', 'kodlayıcı')}
         </Text>
         <Text at={[ENC.x + ENC.w / 2, ENC.y + ENC.h / 2 + 6]} size={11.5} anchor="middle" tone="muted">
-          Table 5-7
+          {L('Table 5-7', 'Tablo 5-7')}
         </Text>
       </Block>
       {[1, 2, 3, 4, 5, 6, 7].map((i) => {
@@ -347,11 +348,11 @@ export function BasicComputerCircuit({
 
       {/* ---------------- Common bus (Fig. 5-4) ---------------- */}
       <Text at={[BUS_X - 28, BUS_TOP - 30]} size={12.5} weight={600} tone="muted">
-        Common bus (Fig. 5-4)
+        {L('Common bus (Fig. 5-4)', 'Ortak yol (Şekil 5-4)')}
       </Text>
-      <Block x={BUS_X - 30} y={BUS_TOP - 22} w={60} h={24} on={busOn} title="Bus multiplexer: S2S1S0 selects the source">
+      <Block x={BUS_X - 30} y={BUS_TOP - 22} w={60} h={24} on={busOn} title={L('Bus multiplexer: S2S1S0 selects the source', 'Yol çoklayıcısı: S2S1S0 kaynağı seçer')}>
         <Text at={[BUS_X, BUS_TOP - 10]} size={11.5} anchor="middle" mono tone={busOn ? 'active' : 'muted'}>
-          select
+          {L('select', 'seçim')}
         </Text>
       </Block>
       <Wire points={[[BUS_X, BUS_TOP + 2], [BUS_X, BUS_BOTTOM]]} on={busOn} kind="bus" />
@@ -402,11 +403,11 @@ export function BasicComputerCircuit({
               h={r.h}
               on={src || dst}
               changed={ch || memWritten}
-              title={name === 'Memory' ? 'Memory unit 4096 × 16. Click to see the memory.' : `${name} (${width} bits). Click to edit.`}
+              title={name === 'Memory' ? L('Memory unit 4096 × 16. Click to see the memory.', 'Bellek birimi 4096 × 16. Belleği görmek için tıkla.') : L(`${name} (${width} bits). Click to edit.`, `${name} (${width} bit). Düzenlemek için tıkla.`)}
               onClick={() => onEdit(name)}
             >
               <Text at={[RX + 12, r.y + r.h / 2 - (name === 'Memory' ? 8 : 0)]} size={13} weight={600}>
-                {name === 'Memory' ? 'Memory 4096 × 16' : name}
+                {name === 'Memory' ? L('Memory 4096 × 16', 'Bellek 4096 × 16') : name}
               </Text>
               {name === 'Memory' && (
                 <Text at={[RX + 12, r.y + r.h / 2 + 12]} size={11.5} mono tone="muted">
@@ -415,7 +416,7 @@ export function BasicComputerCircuit({
               )}
               {ch && oldValue(name) !== undefined && (
                 <Text at={[RX + RW - 12, r.y + 14]} size={11.5} mono anchor="end" tone="muted">
-                  was {v(oldValue(name)!, width)}
+                  {L('was', 'önceden')} {v(oldValue(name)!, width)}
                 </Text>
               )}
               <Text at={[RX + RW - 12, r.y + r.h / 2 + (ch ? 6 : 0)]} size={17} mono anchor="end" tone={ch || memWritten ? 'changed' : 'text'} weight={500}>
@@ -437,16 +438,16 @@ export function BasicComputerCircuit({
         arrow
       />
       <Text at={[RX + RW + 30, 342]} size={12.5} tone="muted">
-        address
+        {L('address', 'adres')}
       </Text>
 
       {/* Adder and logic circuit, E and AC (Fig. 5-20, 5-21). */}
-      <Block x={ADDER.x} y={ADDER.y} w={ADDER.w} h={ADDER.h} on={s2 && !!t?.acPaths.length} onClick={onOpenAlu} title="Adder and logic circuit, click to open Fig. 5-21">
+      <Block x={ADDER.x} y={ADDER.y} w={ADDER.w} h={ADDER.h} on={s2 && !!t?.acPaths.length} onClick={onOpenAlu} title={L('Adder and logic circuit, click to open Fig. 5-21', 'Toplayıcı ve mantık devresi; Şekil 5-21\'i açmak için tıkla')}>
         <Text at={[ADDER.x + 12, ADDER.y + ADDER.h / 2]} size={12} weight={600}>
-          Adder &amp; logic
+          {L('Adder & logic', 'Toplayıcı ve mantık')}
         </Text>
         <Text at={[ADDER.x + ADDER.w - 12, ADDER.y + ADDER.h / 2]} size={11.5} anchor="end" tone="active">
-          Open Fig. 5-21
+          {L('Open Fig. 5-21', 'Şekil 5-21\'i aç')}
         </Text>
         {s2 && t?.acPaths.length ? (
           <Text at={[ADDER.x + 120, ADDER.y + ADDER.h / 2]} size={12.5} mono tone="active">
@@ -460,7 +461,7 @@ export function BasicComputerCircuit({
       </Text>
       <Wire points={[[RX + 150, ADDER.y + ADDER.h], [RX + 150, 714]]} on={s2 && !!t?.acPaths.length} kind="data" arrow />
       <Wire points={[[INPR.x, INPR.y + INPR.h / 2], [ADDER.x + ADDER.w, INPR.y + INPR.h / 2]]} on={s2 && !!t?.acPaths.some((p) => p.op === 'INPR')} kind="data" arrow />
-      <Block x={INPR.x} y={INPR.y} w={INPR.w} h={INPR.h} changed={changed('INPR')} title="Input register, filled by the keyboard. Click to edit." onClick={() => onEdit('INPR')}>
+      <Block x={INPR.x} y={INPR.y} w={INPR.w} h={INPR.h} changed={changed('INPR')} title={L('Input register, filled by the keyboard. Click to edit.', 'Giriş yazmacı, klavyeden dolar. Düzenlemek için tıkla.')} onClick={() => onEdit('INPR')}>
         <Text at={[INPR.x + 10, INPR.y + INPR.h / 2]} size={12} weight={600}>
           INPR
         </Text>
@@ -468,7 +469,7 @@ export function BasicComputerCircuit({
           {v(shown.reg.INPR, 8)}
         </Text>
       </Block>
-      <Block x={EBOX.x} y={EBOX.y} w={EBOX.w} h={EBOX.h} changed={changed('E')} on={s1 && !!(c?.e.clr || c?.e.com || c?.e.load)} title="E flip-flop: carry / extended AC bit. Click to edit." onClick={() => onEdit('E')}>
+      <Block x={EBOX.x} y={EBOX.y} w={EBOX.w} h={EBOX.h} changed={changed('E')} on={s1 && !!(c?.e.clr || c?.e.com || c?.e.load)} title={L('E flip-flop: carry / extended AC bit. Click to edit.', 'E flip-flop\'u: elde / genişletilmiş AC biti. Düzenlemek için tıkla.')} onClick={() => onEdit('E')}>
         <Text at={[EBOX.x + 10, EBOX.y + EBOX.h / 2]} size={12} weight={600}>
           E
         </Text>
@@ -483,7 +484,7 @@ export function BasicComputerCircuit({
         <g>
           <rect x={RX + RW + 50} y={940} width={120} height={28} rx={6} fill="var(--changed-soft)" stroke="var(--changed)" />
           <Text at={[RX + RW + 110, 954]} size={12.5} anchor="middle" tone="changed" weight={600}>
-            ⎍ clock edge
+            ⎍ {L('clock edge', 'saat kenarı')}
           </Text>
         </g>
       )}
@@ -504,6 +505,7 @@ export function BasicComputerCircuit({
  * lines that feed them to the outputs they raise.
  */
 function ControlGates({ view, sub, live, onOpen }: { view: PulseView | null; sub: number; live: boolean; onOpen: () => void }) {
+  const { L } = useLang();
   const lit = live && sub >= 1;
   const values = view ? literalValues({ ...view.trace.before, mem: new Uint16Array(0) }) : null;
 
@@ -535,12 +537,12 @@ function ControlGates({ view, sub, live, onOpen }: { view: PulseView | null; sub
 
   return (
     <g>
-      <Block x={CL.x} y={CL.y} w={CL.w} h={CL.h} dashed onClick={onOpen} title="Control logic gates, click to see every equation">
+      <Block x={CL.x} y={CL.y} w={CL.w} h={CL.h} dashed onClick={onOpen} title={L('Control logic gates, click to see every equation', 'Kontrol mantık kapıları; tüm denklemleri görmek için tıkla')}>
         <Text at={[CL.x + 14, CL.y + 20]} size={12.5} weight={600} tone="muted">
-          Control logic gates
+          {L('Control logic gates', 'Kontrol mantık kapıları')}
         </Text>
         <Text at={[CL.x + 14, CL.y + 36]} size={11.5} tone="muted">
-          Sec. 5-10. Click for every equation.
+          {L('Sec. 5-10. Click for every equation.', 'Kısım 5-10. Tüm denklemler için tıkla.')}
         </Text>
       </Block>
 
@@ -559,7 +561,7 @@ function ControlGates({ view, sub, live, onOpen }: { view: PulseView | null; sub
 
       {placed.length === 0 && (
         <Text at={[CL.x + 14, CL.y + 70]} size={12.5} tone="muted">
-          {live ? 'No gate outputs 1 in this pulse.' : 'Step a pulse to see the gates.'}
+          {live ? L('No gate outputs 1 in this pulse.', 'Bu darbede hiçbir kapı 1 vermiyor.') : L('Step a pulse to see the gates.', 'Kapıları görmek için bir darbe ilerlet.')}
         </Text>
       )}
 

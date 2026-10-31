@@ -139,7 +139,7 @@ describe('example texts', () => {
   it('name the addresses the assembler really gives their symbols', () => {
     for (const ex of ASM_EXAMPLES) {
       const symbols = assemble(ex.source).symbols;
-      for (const m of ex.expect.matchAll(/([A-Z]{1,3}) \(address ([0-9A-F]{3})\)/g)) {
+      for (const m of `${ex.expect} ${ex.expectTr}`.matchAll(/([A-Z]{1,3}) \((?:address|adres) ([0-9A-F]{3})\)/g)) {
         expect(symbols.get(m[1]), `${ex.id}: ${m[0]}`).toBe(parseInt(m[2], 16));
       }
     }

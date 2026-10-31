@@ -43,3 +43,13 @@ export const AC_OP_LABEL: Record<AcOp, string> = {
   SHR: 'Shift right (with E)',
   SHL: 'Shift left (with E)',
 };
+
+export const AC_OP_LABEL_TR: Record<AcOp, string> = {
+  AND: 'AND (AC ∧ DR)',
+  ADD: 'ADD (AC + DR)',
+  DR: 'DR aktarımı',
+  INPR: 'INPR aktarımı',
+  COM: "Tümleme (AC')",
+  SHR: 'Sağa kaydır (E ile)',
+  SHL: 'Sola kaydır (E ile)',
+};

@@ -248,13 +248,13 @@ describe('register-reference instructions', () => {
     expect(s.reg.AC).toBe(0);
     expect(s.flag.E).toBe(0);
     expect(t3.signals.lines.map((l) => l.control)).toEqual(["D7I'T3 = r", 'rB11', 'rB10']);
-    expect(t3.notices.join(' ')).toMatch(/2 operation bits set \(CLA, CLE\)/);
+    expect(t3.notices.map((n) => n.en).join(' ')).toMatch(/2 operation bits set \(CLA, CLE\)/);
   });
 
   it('ORs the AC circuit outputs when several AC inputs are enabled (CMA + CIR)', () => {
     const { s, t3 } = run(0x7280, { reg: { AC: 0x0002 }, flag: { E: 0 } });
     expect(s.reg.AC).toBe(0xfffd | 0x0001);
-    expect(t3.notices.some((n) => n.includes('ORed'))).toBe(true);
+    expect(t3.notices.some((n) => n.en.includes('ORed'))).toBe(true);
   });
 });
 

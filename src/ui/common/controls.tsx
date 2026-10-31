@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { bitAt, type Base } from '../../core/bits';
-import { useSettings } from '../settings';
+import { useLang, useSettings } from '../settings';
 import { BASE_LABEL, fmt, parseWord } from './format';
 
 /** HEX / BIN / DEC switch bound to the global number base setting. */
 export function BaseSwitch({ allowSigned = false }: { allowSigned?: boolean }) {
   const { base, setBase, signed, setSigned } = useSettings();
+  const { L } = useLang();
   return (
     <div className="base-switch" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      <div className="seg" role="group" aria-label="Number base">
+      <div className="seg" role="group" aria-label={L('Number base', 'Sayı tabanı')}>
         {(['hex', 'bin', 'dec'] as Base[]).map((b) => (
           <button key={b} className="mono" aria-pressed={base === b} onClick={() => setBase(b)}>
             {BASE_LABEL[b]}
@@ -16,12 +17,12 @@ export function BaseSwitch({ allowSigned = false }: { allowSigned?: boolean }) {
         ))}
       </div>
       {allowSigned && base === 'dec' && (
-        <div className="seg" role="group" aria-label="Decimal interpretation">
+        <div className="seg" role="group" aria-label={L('Decimal interpretation', 'Ondalık yorum')}>
           <button aria-pressed={!signed} onClick={() => setSigned(false)}>
-            unsigned
+            {L('unsigned', 'işaretsiz')}
           </button>
           <button aria-pressed={signed} onClick={() => setSigned(true)}>
-            signed
+            {L('signed', 'işaretli')}
           </button>
         </div>
       )}
@@ -29,11 +30,28 @@ export function BaseSwitch({ allowSigned = false }: { allowSigned?: boolean }) {
   );
 }
 
-/** A figure/table reference with a tooltip. */
-export function Ref({ children, title }: { children: ReactNode; title?: string }) {
+/** One click switches the whole interface between English and Turkish. */
+export function LangSwitch() {
+  const { lang, setLang } = useSettings();
   return (
-    <span className="ref" title={title ?? `Mano, Computer System Architecture, 3rd ed.: ${children}`}>
-      {children}
+    <div className="seg" role="group" aria-label={lang === 'tr' ? 'Dil' : 'Language'}>
+      <button aria-pressed={lang === 'en'} lang="en" onClick={() => setLang('en')} title="English">
+        EN
+      </button>
+      <button aria-pressed={lang === 'tr'} lang="tr" onClick={() => setLang('tr')} title="Türkçe">
+        TR
+      </button>
+    </div>
+  );
+}
+
+/** A figure/table reference ("Fig. 5-4", shown as "Şekil 5-4" in Turkish) with a tooltip. */
+export function Ref({ children, title }: { children: ReactNode; title?: string }) {
+  const { L, ref } = useLang();
+  const text = typeof children === 'string' ? ref(children) : children;
+  return (
+    <span className="ref" title={title ?? L(`Mano, Computer System Architecture, 3rd ed.: ${children}`, `Mano, Bilgisayar Sistem Mimarisi, 3. baskı: ${text}`)}>
+      {text}
     </span>
   );
 }
@@ -90,6 +108,7 @@ export function EditableValue({
   editSignal?: number;
 }) {
   const settings = useSettings();
+  const { L } = useLang();
   const base = compact && settings.base === 'bin' ? 'hex' : settings.base;
   const { signed } = settings;
   const [editing, setEditing] = useState(false);
@@ -116,8 +135,8 @@ export function EditableValue({
       <button
         type="button"
         className={`mono ${className}`}
-        aria-label={`Edit ${label}`}
-        title={`Click to edit ${label}`}
+        aria-label={L(`Edit ${label}`, `${label} değerini düzenle`)}
+        title={L(`Click to edit ${label}`, `${label} değerini düzenlemek için tıkla`)}
         onClick={start}
         style={{ background: 'none', border: 0, padding: 0, cursor: 'text', ...style }}
       >

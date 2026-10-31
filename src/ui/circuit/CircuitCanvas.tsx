@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useLang } from '../settings';
 
 export interface Rect {
   x: number;
@@ -36,6 +37,7 @@ export function CircuitCanvas({
   viewRef.current = view;
   const drag = useRef<{ px: number; py: number; view: View } | null>(null);
   const anim = useRef(0);
+  const { L } = useLang();
 
   // Follow camera: frame the focus rectangle at the container's aspect ratio, with a margin.
   const fx = focus?.x, fy = focus?.y, fw = focus?.w, fh = focus?.h;
@@ -124,18 +126,18 @@ export function CircuitCanvas({
         <rect x={-4000} y={-4000} width={10000} height={10000} fill="url(#dots)" />
         {children}
       </svg>
-      <div className="canvas-tools" role="group" aria-label="Zoom">
-        <button className="btn small" onClick={() => zoom(1 / 1.25)} aria-label="Zoom in">
+      <div className="canvas-tools" role="group" aria-label={L('Zoom', 'Yakınlaştırma')}>
+        <button className="btn small" onClick={() => zoom(1 / 1.25)} aria-label={L('Zoom in', 'Yakınlaştır')}>
           +
         </button>
-        <button className="btn small" onClick={() => zoom(1.25)} aria-label="Zoom out">
+        <button className="btn small" onClick={() => zoom(1.25)} aria-label={L('Zoom out', 'Uzaklaştır')}>
           −
         </button>
         <button className="btn small" onClick={() => {
             cancelAnimationFrame(anim.current);
             setView(full);
           }}>
-          Fit
+          {L('Fit', 'Sığdır')}
         </button>
       </div>
     </div>

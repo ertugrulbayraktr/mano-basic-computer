@@ -3,7 +3,7 @@ import { instructionXray, usage as computeUsage } from '../../../core/basic/acti
 import { disassemble } from '../../../core/basic/disasm';
 import { viewPulse } from '../../../core/basic/microsteps';
 import { toHex } from '../../../core/bits';
-import { SPEEDS, useSettings } from '../../settings';
+import { SPEEDS, useLang, useSettings } from '../../settings';
 import { TimingDiagram } from '../../timeline/TimingDiagram';
 import { AssemblerPanel, useAssembler } from './AssemblerPanel';
 import { BasicComputerCircuit } from './BasicComputerCircuit';
@@ -40,7 +40,8 @@ export function BasicComputerRoom() {
   const setDockHeight = useSettings((s) => s.setDockHeight);
   const asmOpen = useAssembler((s) => s.open);
   const trace = sim.lastTrace;
-  const view = useMemo(() => (trace ? viewPulse(trace, sim.state.mem) : null), [trace, sim.state.mem]);
+  const { lang, L } = useLang();
+  const view = useMemo(() => (trace ? viewPulse(trace, sim.state.mem, lang) : null), [trace, sim.state.mem, lang]);
   const xray = useMemo(() => (xrayAt === null ? null : instructionXray(sim.state, xrayAt)), [xrayAt, sim.state]);
   const timelineLength = sim.timeline.length;
   const usage = useMemo(() => (usageOn ? computeUsage(sim.timeline) : null), [usageOn, sim.pulses, timelineLength, sim.timeline]);
@@ -52,20 +53,20 @@ export function BasicComputerRoom() {
     <div className="computer" data-fast={fast}>
       <div className="bench" style={{ ['--dock-h' as string]: `${dockHeight}px` }}>
         <div className="bench-stage">
-          <div className="stage-tools" role="toolbar" aria-label="Circuit view">
-            <button className="btn small" aria-pressed={follow} onClick={() => setView({ follow: !follow })} title="The camera follows each sub-step of the pulse">
-              Follow
+          <div className="stage-tools" role="toolbar" aria-label={L('Circuit view', 'Devre görünümü')}>
+            <button className="btn small" aria-pressed={follow} onClick={() => setView({ follow: !follow })} title={L('The camera follows each sub-step of the pulse', 'Kamera darbenin her alt adımını takip eder')}>
+              {L('Follow', 'Takip')}
             </button>
-            <button className="btn small" aria-pressed={usageOn} onClick={() => setView({ usage: !usageOn })} title="Shade every part of the circuit by how many pulses used it">
-              Usage
+            <button className="btn small" aria-pressed={usageOn} onClick={() => setView({ usage: !usageOn })} title={L('Shade every part of the circuit by how many pulses used it', 'Devrenin her parçasını kaç darbede kullanıldığına göre gölgelendir')}>
+              {L('Usage', 'Kullanım')}
             </button>
             {xray && xrayAt !== null ? (
               <span className="xray-tag">
-                X-ray of {toHex(xrayAt, 12)}: {disassemble(sim.state.mem[xrayAt]).text}, {xray.pulses.length} pulses
+                {L('X-ray of', 'Röntgen:')} {toHex(xrayAt, 12)}: {disassemble(sim.state.mem[xrayAt]).text}, {xray.pulses.length} {L('pulses', 'darbe')}
               </span>
             ) : (
               <span className="muted" style={{ fontSize: 12 }}>
-                Hover a memory word to x-ray its instruction.
+                {L('Hover a memory word to x-ray its instruction.', 'Komutunu röntgenlemek için bir bellek kelimesinin üzerine gel.')}
               </span>
             )}
           </div>
@@ -91,26 +92,26 @@ export function BasicComputerRoom() {
             </p>
           )}
           {asmOpen && (
-            <div className="sheet" role="dialog" aria-label="Write a program" onKeyDown={(e) => e.key === 'Escape' && useAssembler.getState().setOpen(false)}>
+            <div className="sheet" role="dialog" aria-label={L('Write a program', 'Program yaz')} onKeyDown={(e) => e.key === 'Escape' && useAssembler.getState().setOpen(false)}>
               <AssemblerPanel />
             </div>
           )}
         </div>
 
-        <aside className="bench-inspector" aria-label="Inspector">
+        <aside className="bench-inspector" aria-label={L('Inspector', 'İnceleme')}>
           <StepPanel view={view} />
           {program?.expect && (
             <section className="example-note">
-              <span className="cap">{program.title}</span>
-              <p>{program.expect}</p>
+              <span className="cap">{lang === 'tr' ? (program.titleTr ?? program.title) : program.title}</span>
+              <p>{lang === 'tr' ? (program.expectTr ?? program.expect) : program.expect}</p>
             </section>
           )}
-          <div className="tabs" role="tablist" aria-label="Machine state">
+          <div className="tabs" role="tablist" aria-label={L('Machine state', 'Makine durumu')}>
             {(
               [
-                ['registers', 'Registers'],
-                ['memory', 'Memory'],
-                ['io', 'I/O'],
+                ['registers', L('Registers', 'Yazmaçlar')],
+                ['memory', L('Memory', 'Bellek')],
+                ['io', L('I/O', 'G/Ç')],
               ] as [Tab, string][]
             ).map(([id, label]) => (
               <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>
@@ -126,7 +127,7 @@ export function BasicComputerRoom() {
         <div className="bench-dock">
           <button
             className="dock-handle"
-            aria-label="Resize the timeline (arrow keys)"
+            aria-label={L('Resize the timeline (arrow keys)', 'Zaman çizelgesini boyutlandır (ok tuşları)')}
             onPointerDown={(e) => {
               e.currentTarget.setPointerCapture(e.pointerId);
               resize.current = { y: e.clientY, h: dockHeight };

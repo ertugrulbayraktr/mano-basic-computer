@@ -3,6 +3,7 @@ import { createJSONStorage, persist, type StateStorage } from 'zustand/middlewar
 import type { Base } from '../core/bits';
 import type { ArithmeticEncoding } from '../core/alu/arithmetic';
 import { DEFAULT_LANES } from '../core/basic/waveforms';
+import { localizeRef, pick, type Lang } from '../core/i18n';
 
 /** localStorage that never throws (private mode, blocked storage, previews). */
 export const safeStorage: StateStorage = {
@@ -35,6 +36,9 @@ export type Width = 4 | 8 | 16;
 export const SPEEDS = [1, 2, 4, 8, 16, 32, 100, 500, 2000, Infinity] as const;
 
 interface Settings {
+  /** Interface language. */
+  lang: Lang;
+  setLang: (l: Lang) => void;
   base: Base;
   signed: boolean;
   width: Width;
@@ -58,6 +62,8 @@ interface Settings {
 export const useSettings = create<Settings>()(
   persist(
     (set) => ({
+      lang: browserLang(),
+      setLang: (lang) => set({ lang }),
       base: 'hex',
       signed: false,
       width: 4,
@@ -78,3 +84,25 @@ export const useSettings = create<Settings>()(
     { name: 'mano-settings', storage: createJSONStorage(() => safeStorage) },
   ),
 );
+
+/** Turkish when the browser prefers it, English otherwise (only used before the user chooses). */
+function browserLang(): Lang {
+  try {
+    return navigator.language?.toLowerCase().startsWith('tr') ? 'tr' : 'en';
+  } catch {
+    return 'en';
+  }
+}
+
+/**
+ * The current language and a helper that picks between an English and a Turkish text:
+ * `L('Step', 'Adım')`. `ref` translates book references ("Fig. 5-4" → "Şekil 5-4").
+ */
+export function useLang() {
+  const lang = useSettings((s) => s.lang);
+  return {
+    lang,
+    L: (en: string, tr: string) => pick(lang, en, tr),
+    ref: (r: string) => localizeRef(r, lang),
+  };
+}

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { FLAG_TITLE, FLAGS, REG_TITLE, REG_WIDTH, REGISTERS, type FlagName, type RegName } from '../../../core/basic/types';
+import { FLAG_TITLE, FLAG_TITLE_TR, FLAGS, REG_TITLE, REG_TITLE_TR, REG_WIDTH, REGISTERS, type FlagName, type RegName } from '../../../core/basic/types';
+import { useLang } from '../../settings';
 import { EditableValue } from '../../common/controls';
 import { useComputer, useSim } from './store';
 
@@ -18,6 +19,9 @@ export function RegistersPanel({ target }: { target: EditTarget | null }) {
   const sim = useSim();
   const { setRegister, setFlag, setSC } = useComputer();
   const rows = useRef<HTMLDivElement>(null);
+  const { lang, L } = useLang();
+  const regTitle = lang === 'tr' ? REG_TITLE_TR : REG_TITLE;
+  const flagTitle = lang === 'tr' ? FLAG_TITLE_TR : FLAG_TITLE;
 
   useEffect(() => {
     if (target) rows.current?.querySelector(`[data-name="${target.name}"]`)?.scrollIntoView({ block: 'nearest' });
@@ -27,18 +31,18 @@ export function RegistersPanel({ target }: { target: EditTarget | null }) {
   const changed = (n: string) => sim.lastTrace?.changes.some((c) => c.name === n);
 
   return (
-    <section aria-label="Registers and flip-flops">
+    <section aria-label={L('Registers and flip-flops', 'Yazmaçlar ve flip-flop\'lar')}>
       <p style={{ margin: '0 0 10px', color: 'var(--ink-2)', fontSize: 13 }}>
-        Click a value to change it. Back undoes an edit.
+        {L('Click a value to change it. Back undoes an edit.', 'Değiştirmek için bir değere tıkla. Geri düğmesi düzenlemeyi geri alır.')}
       </p>
-      <div ref={rows} className="reg-table" role="table" aria-label="Registers">
+      <div ref={rows} className="reg-table" role="table" aria-label={L('Registers', 'Yazmaçlar')}>
         {REGISTERS.map((r) => (
           <div key={r} role="row" data-name={r} className={`reg-row ${target?.name === r ? 'targeted' : ''}`}>
-            <span role="rowheader" className="reg-name" title={REG_TITLE[r]}>
+            <span role="rowheader" className="reg-name" title={regTitle[r]}>
               {r}
             </span>
             <span role="cell" className="muted reg-desc">
-              {REG_TITLE[r]}, {REG_WIDTH[r]} bits
+              {regTitle[r]}, {REG_WIDTH[r]} {L('bits', 'bit')}
             </span>
             <span role="cell">
               <EditableValue
@@ -58,7 +62,7 @@ export function RegistersPanel({ target }: { target: EditTarget | null }) {
             SC
           </span>
           <span role="cell" className="muted reg-desc">
-            Sequence counter, 4 bits
+            {L('Sequence counter, 4 bits', 'Sıra sayıcı, 4 bit')}
           </span>
           <span role="cell">
             <EditableValue compact value={sim.state.SC} width={4} label="SC" onCommit={setSC} editSignal={signal('SC')} className={changed('SC') ? 'changed-value' : ''} />
@@ -66,15 +70,15 @@ export function RegistersPanel({ target }: { target: EditTarget | null }) {
         </div>
       </div>
       <div className="cap" style={{ margin: '14px 0 6px' }}>
-        Flip-flops
+        {L('Flip-flops', 'Flip-flop\'lar')}
       </div>
-      <div className="chips" role="group" aria-label="Flip-flops">
+      <div className="chips" role="group" aria-label={L('Flip-flops', 'Flip-flop\'lar')}>
         {FLAGS.map((f) => (
           <button
             key={f}
             data-name={f}
             className={`chip ff ${sim.state.flag[f] ? 'set' : ''} ${target?.name === f ? 'targeted' : ''}`}
-            title={`${FLAG_TITLE[f]}. Click to toggle.`}
+            title={`${flagTitle[f]}. ${L('Click to toggle.', 'Değiştirmek için tıkla.')}`}
             aria-pressed={sim.state.flag[f] === 1}
             onClick={() => setFlag(f, sim.state.flag[f] ? 0 : 1)}
           >

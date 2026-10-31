@@ -1,5 +1,6 @@
 import { toBin, toHex } from '../bits';
-import { AC_OP_LABEL } from './adderLogic';
+import { pick, type Lang } from '../i18n';
+import { AC_OP_LABEL, AC_OP_LABEL_TR } from './adderLogic';
 import { evaluateControl, termLabel, type EquationValue } from './controlLogic';
 import { fieldOpcode } from './isa';
 import type { PulseTrace } from './pulse';
@@ -46,8 +47,19 @@ export interface PulseView {
 
 const hex = (v: number, w: number) => toHex(v, w);
 
+export const MICRO_STEP_TITLE_TR: Record<MicroStepKind, string> = {
+  decode: 'Zamanlama ve çözme',
+  control: 'Kontrol kapıları',
+  transfer: 'Veri akışı',
+  latch: 'Saat kenarı',
+};
+
+/** Title of a sub-step in a language. */
+export const microStepTitle = (k: MicroStepKind, lang: Lang = 'en') => (lang === 'tr' ? MICRO_STEP_TITLE_TR[k] : MICRO_STEP_TITLE[k]);
+
 /** Builds the four sub-steps of a pulse from its trace. */
-export function viewPulse(trace: PulseTrace, mem?: Uint16Array): PulseView {
+export function viewPulse(trace: PulseTrace, mem?: Uint16Array, lang: Lang = 'en'): PulseView {
+  const L = (en: string, tr: string) => pick(lang, en, tr);
   const pre = { ...trace.before, mem: mem ?? new Uint16Array(4096) } as MachineState;
   const T = pre.SC;
   const D = fieldOpcode(pre.reg.IR);
@@ -67,52 +79,91 @@ export function viewPulse(trace: PulseTrace, mem?: Uint16Array): PulseView {
       D,
       gates,
       active: [],
-      steps: [{ kind: 'decode', title: 'Halted', text: ['S = 0: the clock is stopped, so no timing signal advances.'] }],
+      steps: [
+        {
+          kind: 'decode',
+          title: L('Halted', 'Durdu'),
+          text: [L('S = 0: the clock is stopped, so no timing signal advances.', 'S = 0: saat durdu, bu yüzden hiçbir zamanlama sinyali ilerlemiyor.')],
+        },
+      ],
     };
   }
 
   const { I, R } = pre.flag;
   const decode = [
-    `SC = ${toBin(T, 4)} → the 4 × 16 decoder raises T${T}.`,
-    `IR(12-14) = ${toBin(D, 3)} → the 3 × 8 decoder raises D${D}. I = ${I}, R = ${R}.`,
+    L(`SC = ${toBin(T, 4)} → the 4 × 16 decoder raises T${T}.`, `SC = ${toBin(T, 4)} → 4 × 16 kod çözücü T${T}'yı 1 yapar.`),
+    L(
+      `IR(12-14) = ${toBin(D, 3)} → the 3 × 8 decoder raises D${D}. I = ${I}, R = ${R}.`,
+      `IR(12-14) = ${toBin(D, 3)} → 3 × 8 kod çözücü D${D}'yi 1 yapar. I = ${I}, R = ${R}.`,
+    ),
   ];
-  if (D === 7 && T === 3) decode.push(I ? 'D7 and I with T3 form p = D7IT3 (input-output).' : "D7, I' and T3 form r = D7I'T3 (register-reference).");
+  if (D === 7 && T === 3)
+    decode.push(
+      I
+        ? L('D7 and I with T3 form p = D7IT3 (input-output).', 'D7, I ve T3 birlikte p = D7IT3 olur (giriş-çıkış).')
+        : L("D7, I' and T3 form r = D7I'T3 (register-reference).", "D7, I' ve T3 birlikte r = D7I'T3 olur (yazmaç başvurulu)."),
+    );
 
   // Group active gates by their product term so the text reads "D1T4 → LD(DR), Read, x7".
   const byTerm = new Map<string, string[]>();
   for (const g of active) for (const term of g.terms) byTerm.set(term, [...(byTerm.get(term) ?? []), g.name]);
   const control = byTerm.size
     ? [...byTerm].map(([term, outs]) => `${term} = 1 → ${outs.join(', ')}.`)
-    : ['No control gate is 1 in this pulse; only SC counts up.'];
-  if (!gates['SC.CLR'].out) control.push('CLR(SC) is 0, so SC will count up.');
+    : [L('No control gate is 1 in this pulse; only SC counts up.', 'Bu darbede hiçbir kontrol kapısı 1 değil; yalnızca SC sayar.')];
+  if (!gates['SC.CLR'].out) control.push(L('CLR(SC) is 0, so SC will count up.', 'CLR(SC) 0, bu yüzden SC bir artacak.'));
 
   const transfer: string[] = [];
   const c = trace.signals;
   if (trace.busValue !== null) {
     const x = c.busSelect;
     const width = trace.busSource === 'Memory' ? 16 : REG_WIDTH[trace.busSource as RegName];
+    const v = hex(trace.busValue, width);
+    const addr = hex(pre.reg.AR, 12);
     transfer.push(
-      `x${x} = 1 → the bus encoder sets S2S1S0 = ${toBin(x, 3)}; ${trace.busSource === 'Memory' ? `memory places M[AR] = M[${hex(pre.reg.AR, 12)}]` : `${trace.busSource} places its value`} = ${hex(trace.busValue, width)} on the bus.`,
+      trace.busSource === 'Memory'
+        ? L(
+            `x${x} = 1 → the bus encoder sets S2S1S0 = ${toBin(x, 3)}; memory places M[AR] = M[${addr}] = ${v} on the bus.`,
+            `x${x} = 1 → yol kodlayıcısı S2S1S0 = ${toBin(x, 3)} yapar; bellek M[AR] = M[${addr}] = ${v} değerini ortak yola koyar.`,
+          )
+        : L(
+            `x${x} = 1 → the bus encoder sets S2S1S0 = ${toBin(x, 3)}; ${trace.busSource} places its value = ${v} on the bus.`,
+            `x${x} = 1 → yol kodlayıcısı S2S1S0 = ${toBin(x, 3)} yapar; ${trace.busSource} değerini (${v}) ortak yola koyar.`,
+          ),
     );
     const takers = (['AR', 'PC', 'DR', 'IR', 'TR', 'OUTR'] as RegName[]).filter((r) => c.reg[r].ld);
-    if (takers.length) transfer.push(`The bus value waits at the inputs of ${takers.join(', ')} (LD = 1).`);
-    if (c.memWrite) transfer.push(`Memory Write = 1: the bus value waits to be written at M[${hex(pre.reg.AR, 12)}].`);
+    if (takers.length)
+      transfer.push(L(`The bus value waits at the inputs of ${takers.join(', ')} (LD = 1).`, `Ortak yoldaki değer ${takers.join(', ')} girişlerinde bekler (LD = 1).`));
+    if (c.memWrite)
+      transfer.push(
+        L(`Memory Write = 1: the bus value waits to be written at M[${addr}].`, `Bellek Write = 1: ortak yoldaki değer M[${addr}] adresine yazılmayı bekler.`),
+      );
   } else {
-    transfer.push('S2S1S0 = 000: no source drives the bus.');
+    transfer.push(L('S2S1S0 = 000: no source drives the bus.', 'S2S1S0 = 000: ortak yolu hiçbir kaynak sürmüyor.'));
   }
   for (const p of trace.acPaths) {
-    transfer.push(`Adder and logic circuit (${AC_OP_LABEL[p.op]}) produces ${hex(p.ac, 16)}${p.e !== undefined ? `, E input ${p.e}` : ''} at the inputs of AC.`);
+    const e = p.e !== undefined ? L(`, E input ${p.e}`, `, E girişi ${p.e}`) : '';
+    transfer.push(
+      L(
+        `Adder and logic circuit (${AC_OP_LABEL[p.op]}) produces ${hex(p.ac, 16)}${e} at the inputs of AC.`,
+        `Toplayıcı ve mantık devresi (${AC_OP_LABEL_TR[p.op]}) AC'nin girişlerinde ${hex(p.ac, 16)} üretir${e}.`,
+      ),
+    );
   }
   const incs = (Object.keys(c.reg) as RegName[]).filter((r) => c.reg[r].inr).map((r) => `INR(${r})`);
   const clrs = (Object.keys(c.reg) as RegName[]).filter((r) => c.reg[r].clr).map((r) => `CLR(${r})`);
-  if (incs.length || clrs.length) transfer.push(`${[...incs, ...clrs].join(', ')} are ready for the clock edge.`);
+  if (incs.length || clrs.length) {
+    const list = [...incs, ...clrs].join(', ');
+    transfer.push(L(`${list} are ready for the clock edge.`, `${list} saat kenarı için hazır.`));
+  }
 
   const latch = trace.changes.map((ch) => {
     const w = ch.name in REG_WIDTH ? REG_WIDTH[ch.name as RegName] : 0;
-    return w ? `${ch.name} ← ${hex(ch.after, w)} (was ${hex(ch.before, w)})` : `${ch.name} ← ${ch.after}`;
+    return w ? `${ch.name} ← ${hex(ch.after, w)} (${L('was', 'önceden')} ${hex(ch.before, w)})` : `${ch.name} ← ${ch.after}`;
   });
   for (const m of trace.memory) latch.push(`M[${hex(m.address, 12)}] ← ${hex(m.after, 16)}`);
-  const latchText = latch.length ? [`On the clock edge, at the same instant: ${latch.join(', ')}.`] : ['The clock edge stores nothing new.'];
+  const latchText = latch.length
+    ? [L(`On the clock edge, at the same instant: ${latch.join(', ')}.`, `Saat kenarında, aynı anda: ${latch.join(', ')}.`)]
+    : [L('The clock edge stores nothing new.', 'Saat kenarı yeni bir şey saklamaz.')];
 
   return {
     trace,
@@ -121,10 +172,10 @@ export function viewPulse(trace: PulseTrace, mem?: Uint16Array): PulseView {
     gates,
     active,
     steps: [
-      { kind: 'decode', title: MICRO_STEP_TITLE.decode, text: decode },
-      { kind: 'control', title: MICRO_STEP_TITLE.control, text: control },
-      { kind: 'transfer', title: MICRO_STEP_TITLE.transfer, text: transfer },
-      { kind: 'latch', title: MICRO_STEP_TITLE.latch, text: latchText },
+      { kind: 'decode', title: microStepTitle('decode', lang), text: decode },
+      { kind: 'control', title: microStepTitle('control', lang), text: control },
+      { kind: 'transfer', title: microStepTitle('transfer', lang), text: transfer },
+      { kind: 'latch', title: microStepTitle('latch', lang), text: latchText },
     ],
   };
 }

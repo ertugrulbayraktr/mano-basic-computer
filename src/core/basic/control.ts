@@ -1,4 +1,5 @@
 import type { Bit } from '../bits';
+import { msg, type Msg } from '../i18n';
 import { fieldOpcode, IOI, MRI, RRI } from './isa';
 import type { FlagName, MachineState, RegName } from './types';
 
@@ -43,7 +44,7 @@ export interface ControlSignals {
   /** I ← IR(15) at T2. */
   loadI: boolean;
   sc: 'inc' | 'clr' | 'hold';
-  notices: string[];
+  notices: Msg[];
 }
 
 const noRegControl = (): Record<RegName, RegControl> => ({
@@ -195,7 +196,7 @@ export function controlSignals(s: MachineState): ControlSignals {
   }
 
   if (c.lines.length === 0) {
-    c.notices.push(`No microoperation is enabled at T${T}; SC keeps counting.`);
+    c.notices.push(msg(`No microoperation is enabled at T${T}; SC keeps counting.`, `T${T} anında hiçbir mikroişlem etkin değil; SC saymaya devam eder.`));
   }
   return c;
 }
@@ -357,19 +358,22 @@ function inputOutput(IR: number, s: MachineState, c: ControlSignals, line: LineF
     }
   }
   if (ops.some((o) => o.mnemonic === 'ION') && ops.some((o) => o.mnemonic === 'IOF')) {
-    c.notices.push('ION and IOF are both selected; IEN ← 0 wins in this simulator.');
+    c.notices.push(msg('ION and IOF are both selected; IEN ← 0 wins in this simulator.', 'ION ve IOF birlikte seçili; bu simülatörde IEN ← 0 kazanır.'));
   }
   multiOpNotice(ops.map((o) => o.mnemonic), 'input-output', c);
 }
 
-function multiOpNotice(mnemonics: string[], kind: string, c: ControlSignals) {
+function multiOpNotice(mnemonics: string[], kind: 'register-reference' | 'input-output', c: ControlSignals) {
+  const trKind = kind === 'register-reference' ? 'yazmaç başvurulu' : 'giriş-çıkış';
   if (mnemonics.length > 1) {
     c.notices.push(
-      `This ${kind} word has ${mnemonics.length} operation bits set (${mnemonics.join(', ')}). ` +
-        'The hardware enables all of them in the same T3 pulse.',
+      msg(
+        `This ${kind} word has ${mnemonics.length} operation bits set (${mnemonics.join(', ')}). The hardware enables all of them in the same T3 pulse.`,
+        `Bu ${trKind} kelimesinde ${mnemonics.length} işlem biti 1 (${mnemonics.join(', ')}). Donanım hepsini aynı T3 darbesinde etkinleştirir.`,
+      ),
     );
   }
   if (mnemonics.length === 0) {
-    c.notices.push(`This ${kind} word selects no operation; only SC ← 0 happens.`);
+    c.notices.push(msg(`This ${kind} word selects no operation; only SC ← 0 happens.`, `Bu ${trKind} kelimesi hiçbir işlem seçmiyor; yalnızca SC ← 0 olur.`));
   }
 }

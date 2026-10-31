@@ -1,4 +1,5 @@
 import { bitAt, toBin, type Bit } from '../bits';
+import { pick, type Lang } from '../i18n';
 import { fullAdder } from '../blocks/adders';
 import { alu, type AluUnit } from './alu';
 import { ySource, type ArithmeticEncoding, type YSource } from './arithmetic';
@@ -51,8 +52,17 @@ export interface AluCircuit {
 }
 
 const UNIT_NAME: Record<AluUnit, string> = { arithmetic: 'arithmetic result D', logic: 'logic result E', shr: 'A shifted right', shl: 'A shifted left' };
+const UNIT_NAME_TR: Record<AluUnit, string> = { arithmetic: 'aritmetik sonucu D\'yi', logic: 'mantık sonucu E\'yi', shr: 'sağa kaydırılmış A\'yı', shl: 'sola kaydırılmış A\'yı' };
 
-export function aluCircuit(a: number, b: number, select: number, cin: Bit, width: number, enc: ArithmeticEncoding = 'table4-8'): AluCircuit {
+export function aluCircuit(
+  a: number,
+  b: number,
+  select: number,
+  cin: Bit,
+  width: number,
+  enc: ArithmeticEncoding = 'table4-8',
+  lang: Lang = 'en',
+): AluCircuit {
   const s1s0 = select & 3;
   const s3s2 = (select >> 2) & 3;
   const whole = alu(a, b, select, cin, width, enc);
@@ -79,47 +89,77 @@ export function aluCircuit(a: number, b: number, select: number, cin: Bit, width
 
   const sel = toBin(select, 4);
   const yName = stages[0].yInputs[s1s0].source;
+  const L = (en: string, tr: string) => pick(lang, en, tr);
+  const yWord = toBin(stages.reduce((v, s) => v | (s.y << s.i), 0), width);
+  const eWord = toBin(stages.reduce((v, s) => v | (s.e << s.i), 0), width);
+  const yExtra = yName === 'B' || yName === "B'" ? '' : yName === '0' ? L(' (all 0s)', ' (hepsi 0)') : L(' (all 1s)', ' (hepsi 1)');
   const steps: AluStep[] = [
     {
       kind: 'inputs',
-      title: 'Inputs and select lines',
+      title: L('Inputs and select lines', 'Girişler ve seçim hatları'),
       text: [
         `A = ${toBin(a, width)}, B = ${toBin(b, width)}, Cin = ${cin}.`,
-        `S3S2S1S0 = ${sel}: every stage receives the same select lines. S1S0 = ${toBin(s1s0, 2)} goes to the Y multiplexers and the logic multiplexers; S3S2 = ${toBin(s3s2, 2)} to the output multiplexers.`,
+        L(
+          `S3S2S1S0 = ${sel}: every stage receives the same select lines. S1S0 = ${toBin(s1s0, 2)} goes to the Y multiplexers and the logic multiplexers; S3S2 = ${toBin(s3s2, 2)} to the output multiplexers.`,
+          `S3S2S1S0 = ${sel}: her kat aynı seçim hatlarını alır. S1S0 = ${toBin(s1s0, 2)} Y çoklayıcılarına ve mantık çoklayıcılarına, S3S2 = ${toBin(s3s2, 2)} çıkış çoklayıcılarına gider.`,
+        ),
       ],
     },
     {
       kind: 'y',
-      title: 'Y multiplexers',
-      text: [`S1S0 = ${toBin(s1s0, 2)} selects input ${s1s0} of each 4×1 MUX: Y = ${yName}${yName === 'B' || yName === "B'" ? '' : yName === '0' ? ' (all 0s)' : ' (all 1s)'} = ${toBin(stages.reduce((v, s) => v | (s.y << s.i), 0), width)}.`],
+      title: L('Y multiplexers', 'Y çoklayıcıları'),
+      text: [
+        L(
+          `S1S0 = ${toBin(s1s0, 2)} selects input ${s1s0} of each 4×1 MUX: Y = ${yName}${yExtra} = ${yWord}.`,
+          `S1S0 = ${toBin(s1s0, 2)} her 4×1 MUX'un ${s1s0}. girişini seçer: Y = ${yName}${yExtra} = ${yWord}.`,
+        ),
+      ],
     },
     ...stages.map((s) => ({
       kind: 'carry' as const,
       stage: s.i,
-      title: `Full adder ${s.i}`,
+      title: L(`Full adder ${s.i}`, `Tam toplayıcı ${s.i}`),
       text: [
-        `Stage ${s.i}: A${s.i} + Y${s.i} + C${s.i} = ${s.a} + ${s.y} + ${s.cin} → D${s.i} = ${s.d}, carry C${s.i + 1} = ${s.cout}.`,
-        s.i < width - 1 ? `C${s.i + 1} ripples to stage ${s.i + 1}; it cannot finish before this carry arrives.` : `C${width} is the output carry.`,
+        L(
+          `Stage ${s.i}: A${s.i} + Y${s.i} + C${s.i} = ${s.a} + ${s.y} + ${s.cin} → D${s.i} = ${s.d}, carry C${s.i + 1} = ${s.cout}.`,
+          `Kat ${s.i}: A${s.i} + Y${s.i} + C${s.i} = ${s.a} + ${s.y} + ${s.cin} → D${s.i} = ${s.d}, elde C${s.i + 1} = ${s.cout}.`,
+        ),
+        s.i < width - 1
+          ? L(`C${s.i + 1} ripples to stage ${s.i + 1}; it cannot finish before this carry arrives.`, `C${s.i + 1} kat ${s.i + 1}'e yayılır; o kat bu elde gelmeden bitemez.`)
+          : L(`C${width} is the output carry.`, `C${width} çıkış eldesidir.`),
       ],
     })),
     {
       kind: 'logic',
-      title: 'Logic stage',
+      title: L('Logic stage', 'Mantık katı'),
       text: [
-        `The AND, OR, XOR and NOT gates work on A and B in parallel with the adder; S1S0 = ${toBin(s1s0, 2)} lets the ${['AND', 'OR', 'XOR', 'NOT'][s1s0]} output through: E = ${toBin(stages.reduce((v, s) => v | (s.e << s.i), 0), width)}.`,
+        L(
+          `The AND, OR, XOR and NOT gates work on A and B in parallel with the adder; S1S0 = ${toBin(s1s0, 2)} lets the ${['AND', 'OR', 'XOR', 'NOT'][s1s0]} output through: E = ${eWord}.`,
+          `AND, OR, XOR ve NOT kapıları toplayıcıyla paralel olarak A ve B üzerinde çalışır; S1S0 = ${toBin(s1s0, 2)} ${['AND', 'OR', 'XOR', 'NOT'][s1s0]} çıkışını geçirir: E = ${eWord}.`,
+        ),
       ],
     },
     {
       kind: 'output',
-      title: 'Output multiplexers',
-      text: [`S3S2 = ${toBin(s3s2, 2)} selects the ${UNIT_NAME[whole.unit]} in every stage: F = ${toBin(whole.f, width)}.`, `${whole.operation}.`],
+      title: L('Output multiplexers', 'Çıkış çoklayıcıları'),
+      text: [
+        L(
+          `S3S2 = ${toBin(s3s2, 2)} selects the ${UNIT_NAME[whole.unit]} in every stage: F = ${toBin(whole.f, width)}.`,
+          `S3S2 = ${toBin(s3s2, 2)} her katta ${UNIT_NAME_TR[whole.unit]} seçer: F = ${toBin(whole.f, width)}.`,
+        ),
+        `${whole.operation}.`,
+      ],
     },
     {
       kind: 'status',
-      title: 'Status bits',
+      title: L('Status bits', 'Durum bitleri'),
       text: [
-        `C = C${width} = ${whole.status.c}, S = F${width - 1} = ${whole.status.s}, Z = ${whole.status.z} (${whole.status.z ? 'all output bits are 0' : 'some output bit is 1'}), V = C${width - 1} ⊕ C${width} = ${whole.status.v}.`,
-        whole.unit === 'arithmetic' ? 'C matters for unsigned numbers, V for signed numbers.' : 'C and V are meaningless after a logic or shift operation.',
+        `C = C${width} = ${whole.status.c}, S = F${width - 1} = ${whole.status.s}, Z = ${whole.status.z} (${
+          whole.status.z ? L('all output bits are 0', 'tüm çıkış bitleri 0') : L('some output bit is 1', 'en az bir çıkış biti 1')
+        }), V = C${width - 1} ⊕ C${width} = ${whole.status.v}.`,
+        whole.unit === 'arithmetic'
+          ? L('C matters for unsigned numbers, V for signed numbers.', 'İşaretsiz sayılar için C, işaretli sayılar için V önemlidir.')
+          : L('C and V are meaningless after a logic or shift operation.', 'Mantık ya da kaydırma işleminden sonra C ve V anlamsızdır.'),
       ],
     },
   ];

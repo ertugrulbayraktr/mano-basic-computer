@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Bit } from '../../../core/bits';
 import { Simulator } from '../../../core/basic/simulator';
+import { msg, type Msg } from '../../../core/i18n';
 import type { FlagName, RegName } from '../../../core/basic/types';
 import { SPEEDS, useSettings } from '../../settings';
 
@@ -8,10 +9,12 @@ import { SPEEDS, useSettings } from '../../settings';
 export interface LoadedProgram {
   id: string;
   title: string;
+  titleTr?: string;
   mem: [number, number][];
   reg?: Partial<Record<RegName, number>>;
   flag?: Partial<Record<FlagName, Bit>>;
   expect?: string;
+  expectTr?: string;
 }
 
 interface ComputerStore {
@@ -19,7 +22,7 @@ interface ComputerStore {
   /** Bumped after every change so components re-render. */
   version: number;
   running: boolean;
-  status: string | null;
+  status: Msg | null;
   program: LoadedProgram | null;
   /**
    * Which sub-step of the last pulse is shown: 0 decode, 1 control gates, 2 data flow,
@@ -62,8 +65,13 @@ let frame = 0;
 export const SUBSTEP_SPEED = 4;
 
 export const useComputer = create<ComputerStore>((set, get) => {
-  const bump = (status: string | null = null, sub = 3) => set((s) => ({ version: s.version + 1, status, sub }));
-  const haltedStatus = () => (sim.halted ? 'Halted (S = 0).' : null);
+  const bump = (status: Msg | null = null, sub = 3) => set((s) => ({ version: s.version + 1, status, sub }));
+  const HALTED = msg('Halted (S = 0).', 'Durdu (S = 0).');
+  const haltedStatus = () => (sim.halted ? HALTED : null);
+  const breakpointMsg = () => {
+    const a = sim.state.reg.PC.toString(16).toUpperCase().padStart(3, '0');
+    return msg(`Breakpoint at ${a}.`, `${a} adresinde kesme noktası.`);
+  };
 
   const stopLoop = () => {
     cancelAnimationFrame(frame);
@@ -86,11 +94,11 @@ export const useComputer = create<ComputerStore>((set, get) => {
           if (get().sub === 3) {
             if (sim.halted) {
               set({ running: false });
-              return bump('Halted (S = 0).');
+              return bump(HALTED);
             }
             if (!first && sim.atBreakpoint()) {
               set({ running: false });
-              return bump(`Breakpoint at ${sim.state.reg.PC.toString(16).toUpperCase().padStart(3, '0')}.`);
+              return bump(breakpointMsg());
             }
             first = false;
             sim.step();
@@ -107,11 +115,11 @@ export const useComputer = create<ComputerStore>((set, get) => {
       while (n-- > 0) {
         if (sim.halted) {
           set({ running: false });
-          return bump('Halted (S = 0).');
+          return bump(HALTED);
         }
         if (!first && sim.atBreakpoint()) {
           set({ running: false });
-          return bump(`Breakpoint at ${sim.state.reg.PC.toString(16).toUpperCase().padStart(3, '0')}.`);
+          return bump(breakpointMsg());
         }
         first = false;
         sim.step();
@@ -198,34 +206,34 @@ export const useComputer = create<ComputerStore>((set, get) => {
       if (p) loadInto(p);
       else sim.reset();
       sim.breakpoints = bps;
-      bump('Reset.');
+      bump(msg('Reset.', 'Sıfırlandı.'));
     },
     clearAll: () => {
       get().pause();
       sim.reset(true);
       sim.breakpoints.clear();
       set({ program: null });
-      bump('Memory and registers cleared.');
+      bump(msg('Memory and registers cleared.', 'Bellek ve yazmaçlar temizlendi.'));
     },
     run: () => {
       if (get().running) return;
       if (sim.halted) sim.setFlag('S', 1);
       set({ running: true });
-      bump('Running…');
+      bump(msg('Running…', 'Çalışıyor…'));
       loop();
     },
     pause: () => {
       if (!get().running) return;
       stopLoop();
       set({ running: false });
-      bump('Paused.');
+      bump(msg('Paused.', 'Duraklatıldı.'));
     },
     load: (p) => {
       get().pause();
       loadInto(p);
       sim.breakpoints.clear();
       set({ program: p });
-      bump(`Loaded ${p.title}.`);
+      bump(msg(`Loaded ${p.title}.`, `${p.titleTr ?? p.title} yüklendi.`));
     },
     setRegister: (r, v) => {
       sim.setRegister(r, v);
@@ -250,7 +258,7 @@ export const useComputer = create<ComputerStore>((set, get) => {
     },
     pressKey: (c) => {
       const ok = sim.pressKey(c);
-      bump(ok ? null : 'Key ignored: FGI = 1, the previous character has not been read yet.');
+      bump(ok ? null : msg('Key ignored: FGI = 1, the previous character has not been read yet.', 'Tuş yok sayıldı: FGI = 1, önceki karakter henüz okunmadı.'));
       return ok;
     },
   };

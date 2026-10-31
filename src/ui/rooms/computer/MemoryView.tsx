@@ -3,6 +3,7 @@ import { disassemble } from '../../../core/basic/disasm';
 import { MEMORY_WORDS } from '../../../core/basic/types';
 import { EditableValue } from '../../common/controls';
 import { parseWord } from '../../common/format';
+import { useLang } from '../../settings';
 import { useComputer, useSim } from './store';
 
 const ROW_H = 28;
@@ -10,6 +11,7 @@ const VISIBLE = 16;
 
 /** Virtualized view of all 4096 words, with PC/AR markers, disassembly and breakpoints. */
 export function MemoryView() {
+  const { L } = useLang();
   const sim = useSim();
   const setMemory = useComputer((s) => s.setMemory);
   const toggleBreakpoint = useComputer((s) => s.toggleBreakpoint);
@@ -40,11 +42,11 @@ export function MemoryView() {
   for (let a = first; a < Math.min(MEMORY_WORDS, first + VISIBLE + 4); a++) rows.push(a);
 
   return (
-    <section className="panel" aria-label="Memory">
+    <section className="panel" aria-label={L('Memory', 'Bellek')}>
       <div className="panel-head">
-        <span className="cap">Memory, 4096 × 16</span>
+        <span className="cap">{L('Memory, 4096 × 16', 'Bellek, 4096 × 16')}</span>
         <label className="cap" style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          <input type="checkbox" checked={follow} onChange={(e) => setFollow(e.target.checked)} /> follow PC
+          <input type="checkbox" checked={follow} onChange={(e) => setFollow(e.target.checked)} /> {L('follow PC', 'PC\'yi izle')}
         </label>
       </div>
       <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
@@ -59,19 +61,19 @@ export function MemoryView() {
           }}
           style={{ display: 'flex', gap: 6 }}
         >
-          <input className="input mono" aria-label="Go to address (hex)" placeholder="addr (hex)" value={goto} onChange={(e) => setGoto(e.target.value)} style={{ width: 110 }} />
-          <button className="btn small" type="submit">Go</button>
+          <input className="input mono" aria-label={L('Go to address (hex)', 'Adrese git (onaltılık)')} placeholder={L('addr (hex)', 'adres (hex)')} value={goto} onChange={(e) => setGoto(e.target.value)} style={{ width: 110 }} />
+          <button className="btn small" type="submit">{L('Go', 'Git')}</button>
         </form>
         <button className="btn small" onClick={() => scrollTo(PC)}>PC</button>
         <button className="btn small" onClick={() => { setFollow(false); scrollTo(AR); }}>AR</button>
       </div>
-      <div className="memory" role="table" aria-label="Memory words">
+      <div className="memory" role="table" aria-label={L('Memory words', 'Bellek kelimeleri')}>
         <div className="mem-row cap" role="row" style={{ height: 22 }}>
-          <span role="columnheader" title="Breakpoint">BP</span>
+          <span role="columnheader" title={L('Breakpoint', 'Kesme noktası')}>{L('BP', 'KN')}</span>
           <span role="columnheader" />
-          <span role="columnheader">Addr</span>
-          <span role="columnheader">Word</span>
-          <span role="columnheader">Disassembly</span>
+          <span role="columnheader">{L('Addr', 'Adres')}</span>
+          <span role="columnheader">{L('Word', 'Kelime')}</span>
+          <span role="columnheader">{L('Disassembly', 'Tersine çeviri')}</span>
         </div>
         <div ref={box} onScroll={(e) => setScroll(e.currentTarget.scrollTop)} style={{ height: VISIBLE * ROW_H, overflowY: 'auto', position: 'relative' }}>
           <div style={{ height: MEMORY_WORDS * ROW_H, position: 'relative' }}>
@@ -90,7 +92,7 @@ export function MemoryView() {
                   onBlur={() => setXray(null)}
                 >
                   <span role="cell">
-                    <button className="bp" aria-pressed={sim.breakpoints.has(a)} aria-label={`Breakpoint at ${a.toString(16)}`} onClick={() => toggleBreakpoint(a)} />
+                    <button className="bp" aria-pressed={sim.breakpoints.has(a)} aria-label={L(`Breakpoint at ${a.toString(16)}`, `${a.toString(16)} adresinde kesme noktası`)} onClick={() => toggleBreakpoint(a)} />
                   </span>
                   <span role="cell" style={{ fontSize: 10, fontWeight: 600, color: a === PC ? 'var(--changed)' : 'var(--active)' }}>
                     {tag}
@@ -99,7 +101,7 @@ export function MemoryView() {
                     {a.toString(16).toUpperCase().padStart(3, "0")}
                   </span>
                   <span role="cell">
-                    <EditableValue compact value={word} width={16} label={`memory word ${a.toString(16)}`} onCommit={(v) => setMemory(a, v)} className={written.has(a) ? 'changed-value' : ''} />
+                    <EditableValue compact value={word} width={16} label={L(`memory word ${a.toString(16)}`, `bellek kelimesi ${a.toString(16)}`)} onCommit={(v) => setMemory(a, v)} className={written.has(a) ? 'changed-value' : ''} />
                   </span>
                   <span role="cell" style={{ color: word ? 'var(--text-2)' : 'var(--muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {disassemble(word).text}

@@ -1,4 +1,5 @@
 import { trunc, type Bit } from '../bits';
+import { msg } from '../i18n';
 import { disassemble } from './disasm';
 import { pulse, type PulseTrace } from './pulse';
 import {
@@ -283,7 +284,7 @@ export class Simulator {
       if (printerBusy === 0 && !this.state.flag.FGO) {
         this.state.flag.FGO = 1;
         trace.changes.push({ name: 'FGO', before: 0, after: 1 });
-        trace.notices.push('The printer finished the character and set FGO = 1.');
+        trace.notices.push(msg('The printer finished the character and set FGO = 1.', 'Yazıcı karakteri bitirdi ve FGO = 1 yaptı.'));
       }
     }
   }

@@ -5,6 +5,8 @@ import type { FlagName, RegName } from '../basic/types';
 export interface HexExample {
   id: string;
   title: string;
+  /** Turkish title. */
+  titleTr: string;
   summary: string;
   /** Book reference shown next to the example. */
   reference: string;
@@ -13,12 +15,15 @@ export interface HexExample {
   flag?: Partial<Record<FlagName, Bit>>;
   /** What the learner should observe. */
   expect: string;
+  /** Turkish version of `expect`. */
+  expectTr: string;
 }
 
 export const HEX_EXAMPLES: HexExample[] = [
   {
     id: 'direct-add',
     title: '1. Direct ADD',
+    titleTr: '1. Doğrudan ADD',
     summary: 'ADD 205 with AC = 0007 and M[205] = 0003.',
     reference: 'Sec. 5-5, Table 5-6',
     mem: [
@@ -29,10 +34,12 @@ export const HEX_EXAMPLES: HexExample[] = [
     reg: { PC: 0x020, AC: 0x0007 },
     flag: { E: 0 },
     expect: 'After T0-T5 (T3 does nothing): AC = 000A, E = 0, PC = 021, DR = 0003.',
+    expectTr: "T0-T5'ten sonra (T3'te bir şey olmaz): AC = 000A, E = 0, PC = 021, DR = 0003.",
   },
   {
     id: 'indirect-add',
     title: '2. Indirect ADD',
+    titleTr: '2. Dolaylı ADD',
     summary: 'ADD 300 I: M[300] holds the effective address 450.',
     reference: 'Fig. 5-2, Table 5-6',
     mem: [
@@ -43,10 +50,12 @@ export const HEX_EXAMPLES: HexExample[] = [
     ],
     reg: { PC: 0x021, AC: 0x000a },
     expect: 'At T3, AR ← 0450. After the instruction: AC = 0009, E = 1.',
+    expectTr: "T3'te AR ← 0450. Komuttan sonra: AC = 0009, E = 1.",
   },
   {
     id: 'indirect-lda',
     title: '3. Indirect LDA',
+    titleTr: '3. Dolaylı LDA',
     summary: 'LDA 300 I loads M[M[300]] into AC.',
     reference: 'Table 5-6',
     mem: [
@@ -57,10 +66,12 @@ export const HEX_EXAMPLES: HexExample[] = [
     ],
     reg: { PC: 0x021 },
     expect: 'After the instruction: AC = 1234.',
+    expectTr: 'Komuttan sonra: AC = 1234.',
   },
   {
     id: 'register-reference',
     title: '4. Register-reference INC',
+    titleTr: '4. Yazmaç başvurulu INC',
     summary: 'INC (7020) executes entirely in T3.',
     reference: 'Table 5-6',
     mem: [
@@ -69,10 +80,12 @@ export const HEX_EXAMPLES: HexExample[] = [
     ],
     reg: { PC: 0x022, AC: 0x0009 },
     expect: 'At T3: AC = 000A and SC ← 0.',
+    expectTr: "T3'te: AC = 000A ve SC ← 0.",
   },
   {
     id: 'bsa',
     title: '5. BSA call and return',
+    titleTr: '5. BSA ile çağırma ve dönüş',
     summary: 'BSA 135 saves the return address at 135; the subroutine returns with BUN 135 I.',
     reference: 'Fig. 5-10',
     mem: [
@@ -84,10 +97,12 @@ export const HEX_EXAMPLES: HexExample[] = [
     ],
     reg: { PC: 0x020 },
     expect: 'After BSA: M[135] = 021, PC = 136. After BUN 135 I: PC = 021, then HLT.',
+    expectTr: "BSA'dan sonra: M[135] = 021, PC = 136. BUN 135 I'dan sonra: PC = 021, ardından HLT.",
   },
   {
     id: 'isz',
     title: '6. ISZ loop counter',
+    titleTr: '6. ISZ döngü sayacı',
     summary: 'Two ISZ 0A0 on M[0A0] = FFFE; the second one skips the INC at 012.',
     reference: 'Table 5-6',
     mem: [
@@ -99,5 +114,6 @@ export const HEX_EXAMPLES: HexExample[] = [
     ],
     reg: { PC: 0x010 },
     expect: 'First ISZ: M[0A0] = FFFF, no skip. Second: M[0A0] = 0000 and INC is skipped (AC stays 0).',
+    expectTr: 'İlk ISZ: M[0A0] = FFFF, atlama yok. İkincisi: M[0A0] = 0000 ve INC atlanır (AC 0 kalır).',
   },
 ];

@@ -5,7 +5,7 @@ import { assemble } from '../../../core/assembler/assembler';
 import { ASM_EXAMPLES, type AsmExample } from '../../../core/programs/asmExamples';
 import { toHex } from '../../../core/bits';
 import { Ref } from '../../common/controls';
-import { safeStorage } from '../../settings';
+import { safeStorage, useLang } from '../../settings';
 import { useComputer } from './store';
 
 interface AsmStore {
@@ -45,10 +45,12 @@ export function loadAssembly(source: string, title: string, ex?: AsmExample): bo
   useComputer.getState().load({
     id: ex?.id ?? 'assembled',
     title,
+    titleTr: ex?.titleTr,
     mem: [...r.words],
     reg: { PC: r.start },
     flag: ex?.flag,
     expect: ex?.expect,
+    expectTr: ex?.expectTr,
   });
   return true;
 }
@@ -56,8 +58,9 @@ export function loadAssembly(source: string, title: string, ex?: AsmExample): bo
 export function AssemblerPanel() {
   const { source, setSource, saved, save, remove, setOpen } = useAssembler();
   const [name, setName] = useState('');
+  const { lang, L } = useLang();
   const editor = useRef<HTMLTextAreaElement>(null);
-  const result = useMemo(() => assemble(source), [source]);
+  const result = useMemo(() => assemble(source, lang), [source, lang]);
   const [message, setMessage] = useState<string | null>(null);
 
   const goToLine = (line: number) => {
@@ -70,19 +73,19 @@ export function AssemblerPanel() {
   };
 
   return (
-    <section className="panel" aria-label="Assembler" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <section className="panel" aria-label={L('Assembler', 'Çevirici')} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div className="panel-head" style={{ marginBottom: 0 }}>
-        <span className="cap">Two-pass assembler</span>
+        <span className="cap">{L('Two-pass assembler', 'İki geçişli çevirici (assembler)')}</span>
         <span style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <Ref title="Ch. 6: Programming the Basic Computer; Sec. 6-3: Assembler">Ch. 6</Ref>
+          <Ref title={L('Ch. 6: Programming the Basic Computer; Sec. 6-3: Assembler', 'Bölüm 6: Temel Bilgisayarın programlanması; Kısım 6-3: Çevirici')}>Ch. 6</Ref>
           <button className="btn small" onClick={() => setOpen(false)}>
-            Close
+            {L('Close', 'Kapat')}
           </button>
         </span>
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
         <label style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          <span className="cap">Open</span>
+          <span className="cap">{L('Open', 'Aç')}</span>
           <select
             className="input"
             value=""
@@ -94,16 +97,16 @@ export function AssemblerPanel() {
               setMessage(null);
             }}
           >
-            <option value="">Example or saved program…</option>
-            <optgroup label="Examples">
+            <option value="">{L('Example or saved program…', 'Örnek ya da kayıtlı program…')}</option>
+            <optgroup label={L('Examples', 'Örnekler')}>
               {ASM_EXAMPLES.map((e) => (
                 <option key={e.id} value={e.id}>
-                  {e.title}
+                  {lang === 'tr' ? e.titleTr : e.title}
                 </option>
               ))}
             </optgroup>
             {Object.keys(saved).length > 0 && (
-              <optgroup label="Saved in this browser">
+              <optgroup label={L('Saved in this browser', 'Bu tarayıcıda kayıtlı')}>
                 {Object.keys(saved).map((n) => (
                   <option key={n} value={`saved:${n}`}>
                     {n}
@@ -118,17 +121,17 @@ export function AssemblerPanel() {
             e.preventDefault();
             if (!name.trim()) return;
             save(name.trim());
-            setMessage(`Saved as "${name.trim()}".`);
+            setMessage(L(`Saved as "${name.trim()}".`, `"${name.trim()}" olarak kaydedildi.`));
           }}
           style={{ display: 'flex', gap: 6 }}
         >
-          <input className="input" aria-label="Program name" placeholder="name" value={name} onChange={(e) => setName(e.target.value)} style={{ width: 120 }} />
+          <input className="input" aria-label={L('Program name', 'Program adı')} placeholder={L('name', 'ad')} value={name} onChange={(e) => setName(e.target.value)} style={{ width: 120 }} />
           <button className="btn small" type="submit">
-            Save
+            {L('Save', 'Kaydet')}
           </button>
           {saved[name.trim()] !== undefined && (
-            <button className="btn small" type="button" onClick={() => { remove(name.trim()); setMessage(`Deleted "${name.trim()}".`); }}>
-              Delete
+            <button className="btn small" type="button" onClick={() => { remove(name.trim()); setMessage(L(`Deleted "${name.trim()}".`, `"${name.trim()}" silindi.`)); }}>
+              {L('Delete', 'Sil')}
             </button>
           )}
         </form>
@@ -137,18 +140,18 @@ export function AssemblerPanel() {
           disabled={!result.ok}
           onClick={() => {
             const ex = ASM_EXAMPLES.find((x) => x.source === source);
-            loadAssembly(source, ex?.title ?? 'Assembled program', ex);
-            setMessage(`Loaded ${result.words.size} words; PC = ${toHex(result.start, 12)}.`);
+            loadAssembly(source, ex?.title ?? L('Assembled program', 'Çevrilmiş program'), ex);
+            setMessage(L(`Loaded ${result.words.size} words; PC = ${toHex(result.start, 12)}.`, `${result.words.size} kelime yüklendi; PC = ${toHex(result.start, 12)}.`));
           }}
         >
-          Assemble &amp; load
+          {L('Assemble & load', 'Çevir ve yükle')}
         </button>
         {message && <span className="mono muted" style={{ fontSize: 12 }}>{message}</span>}
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
         <label style={{ flex: '1 1 380px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span className="cap">Source</span>
+          <span className="cap">{L('Source', 'Kaynak')}</span>
           <textarea
             ref={editor}
             className="mono"
@@ -159,11 +162,11 @@ export function AssemblerPanel() {
             style={{ background: 'var(--surface-2)', color: 'var(--text)', border: '1px solid var(--line)', borderRadius: 4, padding: 10, fontSize: 13, lineHeight: 1.5, resize: 'vertical', tabSize: 8 }}
           />
           {result.errors.length > 0 && (
-            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }} aria-label="Errors">
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }} aria-label={L('Errors', 'Hatalar')}>
               {result.errors.map((e, i) => (
                 <li key={i}>
                   <button className="mono" onClick={() => goToLine(e.line)} style={{ background: 'none', border: 0, color: 'var(--alert)', cursor: 'pointer', textAlign: 'left', padding: 0, fontSize: 13 }}>
-                    Line {e.line}: {e.message}
+                    {L('Line', 'Satır')} {e.line}: {e.message}
                   </button>
                 </li>
               ))}
@@ -171,22 +174,22 @@ export function AssemblerPanel() {
           )}
           {result.warnings.map((w, i) => (
             <span key={i} className="mono" style={{ color: 'var(--changed)', fontSize: 13 }}>
-              Line {w.line}: {w.message}
+              {L('Line', 'Satır')} {w.line}: {w.message}
             </span>
           ))}
         </label>
 
         <div style={{ flex: '1 1 360px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
-            <span className="cap">Listing</span>
+            <span className="cap">{L('Listing', 'Liste')}</span>
             <div style={{ maxHeight: 330, overflow: 'auto', marginTop: 6 }}>
               <table className="data" style={{ width: '100%' }}>
                 <thead>
                   <tr>
-                    <th>Line</th>
-                    <th>Addr</th>
-                    <th>Code</th>
-                    <th>Source</th>
+                    <th>{L('Line', 'Satır')}</th>
+                    <th>{L('Addr', 'Adres')}</th>
+                    <th>{L('Code', 'Kod')}</th>
+                    <th>{L('Source', 'Kaynak')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -203,14 +206,14 @@ export function AssemblerPanel() {
             </div>
           </div>
           <div>
-            <span className="cap">Symbol table, start {toHex(result.start, 12)}</span>
+            <span className="cap">{L('Symbol table, start', 'Sembol tablosu, başlangıç')} {toHex(result.start, 12)}</span>
             <div className="mono" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 16px', marginTop: 6, fontSize: 13 }}>
               {[...result.symbols].map(([s, a]) => (
                 <span key={s}>
                   {s} = {toHex(a, 12)}
                 </span>
               ))}
-              {result.symbols.size === 0 && <span className="muted">no labels</span>}
+              {result.symbols.size === 0 && <span className="muted">{L('no labels', 'etiket yok')}</span>}
             </div>
           </div>
         </div>
