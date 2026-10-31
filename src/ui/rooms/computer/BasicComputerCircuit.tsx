@@ -2,6 +2,7 @@ import { toBin } from '../../../core/bits';
 import { CONTROL_EQUATIONS, literalValue, literalValues, termLabel } from '../../../core/basic/controlLogic';
 import type { PulseView } from '../../../core/basic/microsteps';
 import { REG_WIDTH, type FlagName, type MachineState, type RegName } from '../../../core/basic/types';
+import type { EditTarget } from './RegistersPanel';
 import { CircuitCanvas } from '../../circuit/CircuitCanvas';
 import { Block, Dot, Gate, Pin, Text, Wire } from '../../circuit/parts';
 import { fmt } from '../../common/format';
@@ -86,12 +87,15 @@ export function BasicComputerCircuit({
   state,
   onOpenAlu,
   onOpenGates,
+  onEdit,
 }: {
   view: PulseView | null;
   sub: number;
   state: MachineState;
   onOpenAlu: () => void;
   onOpenGates: () => void;
+  /** A register, flip-flop or SC was clicked: open it for editing. */
+  onEdit: (name: EditTarget['name'] | 'Memory') => void;
 }) {
   const { base } = useSettings();
   const t = view?.trace ?? null;
@@ -161,7 +165,7 @@ export function BasicComputerCircuit({
       ))}
 
       {/* I flip-flop */}
-      <Block x={IFF.x} y={IFF.y} w={IFF.w} h={IFF.h} on={live && shown.flag.I === 1} title="I flip-flop: addressing mode">
+      <Block x={IFF.x} y={IFF.y} w={IFF.w} h={IFF.h} on={live && shown.flag.I === 1} title="I flip-flop: addressing mode. Click to edit." onClick={() => onEdit('I')}>
         <Text at={[IFF.x + 10, IFF.y + IFF.h / 2]} size={12} weight={600}>
           I
         </Text>
@@ -172,7 +176,7 @@ export function BasicComputerCircuit({
       <Wire points={[[IFF.x + IFF.w, IFF.y + IFF.h / 2], [CL.x, IFF.y + IFF.h / 2]]} on={live && shown.flag.I === 1} />
 
       {/* Sequence counter */}
-      <Block x={SCB.x} y={SCB.y} w={SCB.w} h={SCB.h} on={live} changed={changed('SC')} title="Sequence counter SC (4 bits)">
+      <Block x={SCB.x} y={SCB.y} w={SCB.w} h={SCB.h} on={live} changed={changed('SC')} title="Sequence counter SC (4 bits). Click to edit." onClick={() => onEdit('SC')}>
         <Text at={[SCB.x + 10, SCB.y + 18]} size={12.5} tone="muted">
           SC
         </Text>
@@ -210,7 +214,7 @@ export function BasicComputerCircuit({
         const on = live && shown.flag[f] === 1;
         return (
           <g key={f}>
-            <Block x={DEC4.x - 10} y={ffY(i)} w={70} h={30} on={on} changed={changed(f)}>
+            <Block x={DEC4.x - 10} y={ffY(i)} w={70} h={30} on={on} changed={changed(f)} title={`${f} flip-flop. Click to edit.`} onClick={() => onEdit(f)}>
               <Text at={[DEC4.x, ffY(i) + 15]} size={12.5} weight={600}>
                 {f}
               </Text>
@@ -301,7 +305,16 @@ export function BasicComputerCircuit({
                 </Text>
               </>
             )}
-            <Block x={RX} y={r.y} w={RW} h={r.h} on={src || dst} changed={ch || memWritten} title={name === 'Memory' ? 'Memory unit 4096 × 16' : `${name} (${width} bits)`}>
+            <Block
+              x={RX}
+              y={r.y}
+              w={RW}
+              h={r.h}
+              on={src || dst}
+              changed={ch || memWritten}
+              title={name === 'Memory' ? 'Memory unit 4096 × 16. Click to see the memory.' : `${name} (${width} bits). Click to edit.`}
+              onClick={() => onEdit(name)}
+            >
               <Text at={[RX + 12, r.y + r.h / 2 - (name === 'Memory' ? 8 : 0)]} size={13} weight={600}>
                 {name === 'Memory' ? 'Memory 4096 × 16' : name}
               </Text>
@@ -357,7 +370,7 @@ export function BasicComputerCircuit({
       </Text>
       <Wire points={[[RX + 150, ADDER.y + ADDER.h], [RX + 150, 714]]} on={s2 && !!t?.acPaths.length} kind="data" arrow />
       <Wire points={[[INPR.x, INPR.y + INPR.h / 2], [ADDER.x + ADDER.w, INPR.y + INPR.h / 2]]} on={s2 && !!t?.acPaths.some((p) => p.op === 'INPR')} kind="data" arrow />
-      <Block x={INPR.x} y={INPR.y} w={INPR.w} h={INPR.h} changed={changed('INPR')} title="Input register, filled by the keyboard">
+      <Block x={INPR.x} y={INPR.y} w={INPR.w} h={INPR.h} changed={changed('INPR')} title="Input register, filled by the keyboard. Click to edit." onClick={() => onEdit('INPR')}>
         <Text at={[INPR.x + 10, INPR.y + INPR.h / 2]} size={12} weight={600}>
           INPR
         </Text>
@@ -365,7 +378,7 @@ export function BasicComputerCircuit({
           {v(shown.reg.INPR, 8)}
         </Text>
       </Block>
-      <Block x={EBOX.x} y={EBOX.y} w={EBOX.w} h={EBOX.h} changed={changed('E')} on={s1 && !!(c?.e.clr || c?.e.com || c?.e.load)} title="E flip-flop: carry / extended AC bit">
+      <Block x={EBOX.x} y={EBOX.y} w={EBOX.w} h={EBOX.h} changed={changed('E')} on={s1 && !!(c?.e.clr || c?.e.com || c?.e.load)} title="E flip-flop: carry / extended AC bit. Click to edit." onClick={() => onEdit('E')}>
         <Text at={[EBOX.x + 10, EBOX.y + EBOX.h / 2]} size={12} weight={600}>
           E
         </Text>

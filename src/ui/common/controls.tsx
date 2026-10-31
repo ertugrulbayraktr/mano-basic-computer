@@ -76,6 +76,7 @@ export function EditableValue({
   className = '',
   style,
   compact = false,
+  editSignal = 0,
 }: {
   value: number;
   width: number;
@@ -85,6 +86,8 @@ export function EditableValue({
   style?: React.CSSProperties;
   /** In narrow places, show hexadecimal instead of long binary words. */
   compact?: boolean;
+  /** Changing this to a new non-zero number opens the editor (e.g. after a click elsewhere). */
+  editSignal?: number;
 }) {
   const settings = useSettings();
   const base = compact && settings.base === 'bin' ? 'hex' : settings.base;
@@ -93,10 +96,20 @@ export function EditableValue({
   const [text, setText] = useState('');
   const [error, setError] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
+  const start = () => {
+    setText(fmt(value, width, base, signed));
+    setError(false);
+    setEditing(true);
+  };
 
   useEffect(() => {
     if (editing) ref.current?.select();
   }, [editing]);
+
+  useEffect(() => {
+    if (editSignal) start();
+    // Only a new signal opens the editor; value changes must not.
+  }, [editSignal]);
 
   if (!editing) {
     return (
@@ -105,11 +118,7 @@ export function EditableValue({
         className={`mono ${className}`}
         aria-label={`Edit ${label}`}
         title={`Click to edit ${label}`}
-        onClick={() => {
-          setText(fmt(value, width, base, signed));
-          setError(false);
-          setEditing(true);
-        }}
+        onClick={start}
         style={{ background: 'none', border: 0, padding: 0, cursor: 'text', ...style }}
       >
         {fmt(value, width, base, signed)}

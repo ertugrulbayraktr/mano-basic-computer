@@ -349,3 +349,51 @@ dialog.modal {
 dialog.modal::backdrop {
   background: rgb(35 39 47 / 0.3);
 }
+
+/* ---- Registers tab ---- */
+.reg-table {
+  display: flex;
+  flex-direction: column;
+}
+.reg-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+  border-top: 1px solid var(--rule);
+  font-size: 13px;
+}
+.reg-row:first-child {
+  border-top: 0;
+}
+.reg-row.targeted {
+  box-shadow: inset 2px 0 0 var(--ink);
+  background: var(--paper-2);
+}
+.reg-name {
+  font-weight: 700;
+  padding-left: 6px;
+}
+.reg-desc {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.reg-row .mono {
+  font-size: 14px;
+}
+.chip.ff {
+  height: 28px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+.chip.ff.set {
+  border-color: var(--signal);
+  color: var(--signal);
+  font-weight: 600;
+}
+.chip.ff.targeted {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}

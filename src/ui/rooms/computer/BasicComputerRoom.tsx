@@ -6,18 +6,20 @@ import { BasicComputerCircuit } from './BasicComputerCircuit';
 import { ControlBar } from './ControlBar';
 import { GatesDialog } from './GatesDialog';
 import { MemoryView } from './MemoryView';
+import { RegistersPanel, type EditTarget } from './RegistersPanel';
 import { AluDialog, HistoryPanel, IODevices } from './Panels';
 import { StepPanel } from './StepPanel';
 import { SUBSTEP_SPEED, useComputer, useSim } from './store';
 import './computer.css';
 
-type Tab = 'memory' | 'history' | 'io';
+type Tab = 'registers' | 'memory' | 'history' | 'io';
 
 export function BasicComputerRoom() {
   const sim = useSim();
   const [aluOpen, setAluOpen] = useState(false);
   const [gatesOpen, setGatesOpen] = useState(false);
-  const [tab, setTab] = useState<Tab>('memory');
+  const [tab, setTab] = useState<Tab>('registers');
+  const [editTarget, setEditTarget] = useState<EditTarget | null>(null);
   const running = useComputer((s) => s.running);
   const sub = useComputer((s) => s.sub);
   const program = useComputer((s) => s.program);
@@ -32,7 +34,18 @@ export function BasicComputerRoom() {
       {asmOpen && <AssemblerPanel />}
       <div className="workbench">
         <div className="stage">
-          <BasicComputerCircuit view={view} sub={sub} state={sim.state} onOpenAlu={() => setAluOpen(true)} onOpenGates={() => setGatesOpen(true)} />
+          <BasicComputerCircuit
+            view={view}
+            sub={sub}
+            state={sim.state}
+            onOpenAlu={() => setAluOpen(true)}
+            onOpenGates={() => setGatesOpen(true)}
+            onEdit={(name) => {
+              if (name === 'Memory') return setTab('memory');
+              setTab('registers');
+              setEditTarget((t) => ({ name, n: (t?.n ?? 0) + 1 }));
+            }}
+          />
           {program?.expect && (
             <p className="expect">
               <b>{program.title}.</b> {program.expect}
@@ -44,9 +57,10 @@ export function BasicComputerRoom() {
           <div className="tabs" role="tablist" aria-label="Details">
             {(
               [
+                ['registers', 'Registers'],
                 ['memory', 'Memory'],
                 ['history', 'History'],
-                ['io', 'Keyboard & printer'],
+                ['io', 'I/O'],
               ] as [Tab, string][]
             ).map(([id, label]) => (
               <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>
@@ -54,6 +68,7 @@ export function BasicComputerRoom() {
               </button>
             ))}
           </div>
+          {tab === 'registers' && <RegistersPanel target={editTarget} />}
           {tab === 'memory' && <MemoryView />}
           {tab === 'history' && <HistoryPanel />}
           {tab === 'io' && <IODevices />}
