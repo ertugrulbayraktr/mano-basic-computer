@@ -3,13 +3,13 @@ import { bitAt, trunc, type Bit } from '../bits';
 /** Shift microoperations (Table 4-7). */
 export type ShiftOp = 'shl' | 'shr' | 'cil' | 'cir' | 'ashl' | 'ashr';
 
-export const SHIFT_OPS: readonly { op: ShiftOp; rtl: string; name: string }[] = [
-  { op: 'shl', rtl: 'R ← shl R', name: 'Shift-left register R' },
-  { op: 'shr', rtl: 'R ← shr R', name: 'Shift-right register R' },
-  { op: 'cil', rtl: 'R ← cil R', name: 'Circular shift-left register R' },
-  { op: 'cir', rtl: 'R ← cir R', name: 'Circular shift-right register R' },
-  { op: 'ashl', rtl: 'R ← ashl R', name: 'Arithmetic shift-left R' },
-  { op: 'ashr', rtl: 'R ← ashr R', name: 'Arithmetic shift-right R' },
+export const SHIFT_OPS: readonly { op: ShiftOp; rtl: string; name: string; nameTr: string }[] = [
+  { op: 'shl', rtl: 'R ← shl R', name: 'Shift-left register R', nameTr: "R yazmacını sola kaydır" },
+  { op: 'shr', rtl: 'R ← shr R', name: 'Shift-right register R', nameTr: "R yazmacını sağa kaydır" },
+  { op: 'cil', rtl: 'R ← cil R', name: 'Circular shift-left register R', nameTr: "R yazmacını dairesel sola kaydır" },
+  { op: 'cir', rtl: 'R ← cir R', name: 'Circular shift-right register R', nameTr: "R yazmacını dairesel sağa kaydır" },
+  { op: 'ashl', rtl: 'R ← ashl R', name: 'Arithmetic shift-left R', nameTr: "R'yi aritmetik sola kaydır" },
+  { op: 'ashr', rtl: 'R ← ashr R', name: 'Arithmetic shift-right R', nameTr: "R'yi aritmetik sağa kaydır" },
 ];
 
 /**

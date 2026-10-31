@@ -54,6 +54,17 @@ const NAMES: Record<YSource, [string, string]> = {
   '1s': ['Decrement A', 'Transfer A'],
 };
 
+/** Turkish names for the Table 4-4 rows. */
+export const ARITH_NAME_TR: Record<string, string> = {
+  Add: 'Topla',
+  'Add with carry': 'Elde ile topla',
+  'Subtract with borrow': 'Ödünç ile çıkar',
+  Subtract: 'Çıkar',
+  'Transfer A': "A'yı aktar",
+  'Increment A': "A'yı arttır",
+  'Decrement A': "A'yı azalt",
+};
+
 export const ySource = (s1s0: number, enc: ArithmeticEncoding): YSource => Y_SOURCES[enc][s1s0];
 
 export function yValue(src: YSource, b: number, width: number): number {

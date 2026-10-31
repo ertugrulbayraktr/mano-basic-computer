@@ -4,7 +4,7 @@ import type { Bit } from '../../../core/bits';
 import { aluTable } from '../../../core/alu/alu';
 import { aluCircuit, aluSnapshot } from '../../../core/alu/aluSteps';
 import { BitInput, BitToggle, Ref } from '../../common/controls';
-import { useSettings } from '../../settings';
+import { useLang, useSettings } from '../../settings';
 import { Icon } from '../computer/Transport';
 import { AluCircuit } from './AluCircuit';
 import '../computer/computer.css';
@@ -18,12 +18,13 @@ const SPW = 92; // width of one propagation step in the timeline
  */
 export function AluCircuitPage() {
   const { encoding, setEncoding } = useSettings();
+  const { lang, L } = useLang();
   const [a, setA] = useState(0b0110);
   const [b, setB] = useState(0b0011);
   const [select, setSelect] = useState(0b0001);
   const [cin, setCin] = useState<Bit>(0);
   const [follow, setFollow] = useState(false);
-  const data = useMemo(() => aluCircuit(a, b, select, cin, WIDTH, encoding), [a, b, select, cin, encoding]);
+  const data = useMemo(() => aluCircuit(a, b, select, cin, WIDTH, encoding, lang), [a, b, select, cin, encoding, lang]);
   const last = data.steps.length - 1;
   const [step, setStep] = useState(last);
   const [playing, setPlaying] = useState(false);
@@ -56,12 +57,16 @@ export function AluCircuitPage() {
     <div className="computer">
       <div className="bench" style={{ ['--dock-h' as string]: `${Math.max(dockHeight, 230)}px` }}>
         <div className="bench-stage">
-          <div className="stage-tools" role="toolbar" aria-label="Circuit view">
-            <button className="btn small" aria-pressed={follow} onClick={() => setFollow(!follow)} title="The camera follows the propagation, stage by stage">
-              Follow
+          <div className="stage-tools" role="toolbar" aria-label={L('Circuit view', 'Devre görünümü')}>
+            <button className="btn small" aria-pressed={follow} onClick={() => setFollow(!follow)} title={L('The camera follows the propagation, stage by stage', 'Kamera yayılımı kat kat takip eder')}>
+              {L('Follow', 'Takip')}
             </button>
             <span className="muted" style={{ fontSize: 12.5 }}>
-              {data.operation}. All {WIDTH} stages share the select lines; the carry ripples from stage 0 to stage {WIDTH - 1}.
+              {data.operation}.{' '}
+              {L(
+                `All ${WIDTH} stages share the select lines; the carry ripples from stage 0 to stage ${WIDTH - 1}.`,
+                `${WIDTH} katın hepsi aynı seçim hatlarını paylaşır; elde kat 0'dan kat ${WIDTH - 1}'e yayılır.`,
+              )}
             </span>
           </div>
           <AluCircuit data={data} step={step} follow={follow} />
@@ -73,10 +78,10 @@ export function AluCircuitPage() {
           )}
         </div>
 
-        <aside className="bench-inspector" aria-label="Inspector">
-          <section className="step-panel" aria-label="Propagation steps">
+        <aside className="bench-inspector" aria-label={L('Inspector', 'İnceleme')}>
+          <section className="step-panel" aria-label={L('Propagation steps', 'Yayılım adımları')}>
             <div className="panel-head" style={{ marginBottom: 2 }}>
-              <h2 className="step-title">Arithmetic logic shift unit</h2>
+              <h2 className="step-title">{L('Arithmetic logic shift unit', 'Aritmetik mantık kaydırma birimi')}</h2>
               <Ref>Fig. 4-13</Ref>
             </div>
             <div className="rtl-sm">
@@ -110,17 +115,17 @@ export function AluCircuitPage() {
               })}
             </ol>
           </section>
-          <section aria-label="Function table">
+          <section aria-label={L('Function table', 'Fonksiyon tablosu')}>
             <div className="panel-head">
-              <span className="cap">Function table: click a row to choose it</span>
+              <span className="cap">{L('Function table: click a row to choose it', 'Fonksiyon tablosu: seçmek için bir satıra tıkla')}</span>
               <Ref>Table 4-8</Ref>
             </div>
-            <div className="seg" role="radiogroup" aria-label="Arithmetic encoding" style={{ marginBottom: 10 }}>
+            <div className="seg" role="radiogroup" aria-label={L('Arithmetic encoding', 'Aritmetik kodlama')} style={{ marginBottom: 10 }}>
               <button role="radio" aria-checked={encoding === 'table4-8'} onClick={() => { setEncoding('table4-8'); setStep(0); }}>
-                As printed
+                {L('As printed', 'Basıldığı gibi')}
               </button>
               <button role="radio" aria-checked={encoding === 'fig4-9'} onClick={() => { setEncoding('fig4-9'); setStep(0); }}>
-                Fig. 4-9 wiring
+                {L('Fig. 4-9 wiring', 'Şekil 4-9 bağlantısı')}
               </button>
             </div>
             <table className="data" style={{ width: '100%' }}>
@@ -144,26 +149,26 @@ export function AluCircuitPage() {
               </tbody>
             </table>
             <p className="muted" style={{ fontSize: 12.5, margin: '10px 0 0' }}>
-              Each part on its own: <Link to="/lab/arithmetic">arithmetic circuit</Link>, <Link to="/lab/logic">logic circuit</Link>,{' '}
-              <Link to="/lab/status">status bits</Link>.
+              {L('Each part on its own:', 'Her parça ayrı ayrı:')} <Link to="/lab/arithmetic">{L('arithmetic circuit', 'aritmetik devre')}</Link>,{' '}
+              <Link to="/lab/logic">{L('logic circuit', 'mantık devresi')}</Link>, <Link to="/lab/status">{L('status bits', 'durum bitleri')}</Link>.
             </p>
           </section>
         </aside>
 
         <div className="bench-dock">
-          <section className="transport" aria-label="Inputs and stepping">
+          <section className="transport" aria-label={L('Inputs and stepping', 'Girişler ve adımlama')}>
             <div className="transport-row">
-              <button className="btn icon" aria-label="Back one step" onClick={() => { setPlaying(false); setStep(Math.max(0, step - 1)); }} disabled={step === 0}>
+              <button className="btn icon" aria-label={L('Back one step', 'Bir adım geri')} onClick={() => { setPlaying(false); setStep(Math.max(0, step - 1)); }} disabled={step === 0}>
                 <Icon d="M15 5l-7 7 7 7" />
               </button>
               <button className="btn primary grow" onClick={() => { setPlaying(false); setStep(Math.min(last, step + 1)); }} disabled={step === last}>
-                Step
+                {L('Step', 'Adım')}
               </button>
               <button className="btn" onClick={() => { if (step >= last) setStep(0); setPlaying(!playing); }}>
-                {playing ? 'Pause' : step >= last ? 'Replay' : 'Play'}
+                {playing ? L('Pause', 'Duraklat') : step >= last ? L('Replay', 'Yeniden oynat') : L('Play', 'Oynat')}
               </button>
               <button className="btn" onClick={() => { setPlaying(false); setStep(last); }} disabled={step === last}>
-                Result
+                {L('Result', 'Sonuç')}
               </button>
             </div>
             <div className="alu-inputs">
@@ -174,10 +179,10 @@ export function AluCircuitPage() {
             </div>
           </section>
 
-          <div className="timing" aria-label="Propagation timeline">
+          <div className="timing" aria-label={L('Propagation timeline', 'Yayılım zaman çizelgesi')}>
             <div className="timing-labels" style={{ width: 90 }}>
               <div className="tl-label muted" style={{ height: 26, marginTop: 3 }}>
-                Step
+                {L('Step', 'Adım')}
               </div>
               {lanes[0].map((l) => (
                 <div key={l.id} className="tl-label" style={{ height: 26 }}>
@@ -192,7 +197,7 @@ export function AluCircuitPage() {
                 className="timing-svg"
                 role="slider"
                 tabIndex={0}
-                aria-label="Propagation step"
+                aria-label={L('Propagation step', 'Yayılım adımı')}
                 aria-valuemin={1}
                 aria-valuemax={data.steps.length}
                 aria-valuenow={step + 1}
@@ -212,7 +217,7 @@ export function AluCircuitPage() {
                       <title>{s.title}</title>
                     </rect>
                     <text x={i * SPW + 6} y={20} fontSize={10.5} fill={i === step ? 'var(--ink)' : 'var(--muted)'} fontWeight={i === step ? 600 : 400}>
-                      {i + 1}. {s.title.replace('Full adder', 'FA').replace(' multiplexers', ' MUX').replace('Inputs and select lines', 'Inputs')}
+                      {i + 1}. {s.title.replace('Full adder', 'FA').replace('Tam toplayıcı', 'FA').replace(' multiplexers', ' MUX').replace(' çoklayıcıları', ' MUX').replace('Inputs and select lines', 'Inputs').replace('Girişler ve seçim hatları', 'Girişler')}
                     </text>
                     {lanes[i].map((l, k) => {
                       const y = 3 + 26 * (k + 1);

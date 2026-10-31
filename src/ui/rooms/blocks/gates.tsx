@@ -5,7 +5,7 @@ import { gate, GATES, norOnly, truthTable } from '../../../core/blocks/gates';
 import { BlockHeader, CarryChain, Flag, useWord, WidthSelect } from '../../common/blocks';
 import { BitInput, BitToggle, Panel, Ref, Word } from '../../common/controls';
 import { GateSymbol } from '../../common/GateSymbol';
-import { useSettings } from '../../settings';
+import { useLang, useSettings } from '../../settings';
 
 const B: Bit[] = [0, 1];
 
@@ -35,14 +35,15 @@ function Truth({ head, rows, hit }: { head: string[]; rows: (number | string)[][
 
 /** Fig. 1-2 and NOR-only constructions. */
 export function GatesBlock() {
+  const { L } = useLang();
   const [x, setX] = useState<Bit>(0);
   const [y, setY] = useState<Bit>(1);
   return (
     <>
-      <BlockHeader title="Digital logic gates" refs="Fig. 1-2">
-        Toggle x and y. Every gate below updates at once; its truth table highlights the row for the current inputs. NOT uses only x.
+      <BlockHeader title={L("Digital logic gates", "Dijital mantık kapıları")} refs="Fig. 1-2">
+        {L("Toggle x and y. Every gate below updates at once; its truth table highlights the row for the current inputs. NOT uses only x.", "x ve y'yi değiştir. Aşağıdaki her kapı anında güncellenir; doğruluk tablosu o anki girişlerin satırını vurgular. NOT yalnızca x'i kullanır.")}
       </BlockHeader>
-      <Panel title="Inputs">
+      <Panel title={L("Inputs", "Girişler")}>
         <div className="row">
           <BitToggle label="x" value={x} onChange={setX} />
           <BitToggle label="y" value={y} onChange={setY} />
@@ -61,7 +62,7 @@ export function GatesBlock() {
           );
         })}
       </div>
-      <Panel title="Universal gate: NOT, OR and AND from NOR gates only" refs={<Ref>Sec. 1-2</Ref>}>
+      <Panel title={L("Universal gate: NOT, OR and AND from NOR gates only", "Evrensel kapı: yalnızca NOR kapılarıyla NOT, OR ve AND")} refs={<Ref>Sec. 1-2</Ref>}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
           <div>
             <span className="cap">NOT x = (x + x)'</span>
@@ -84,8 +85,8 @@ export function GatesBlock() {
             <span className="cap">xy = (x' + y')'</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <GateSymbol name="NOR" x={x} y={x} out={norOnly.and(x, y).nx} label="NOR as NOT x" />
-                <GateSymbol name="NOR" x={y} y={y} out={norOnly.and(x, y).ny} label="NOR as NOT y" />
+                <GateSymbol name="NOR" x={x} y={x} out={norOnly.and(x, y).nx} label={L("NOR as NOT x", "NOT x olarak NOR")} />
+                <GateSymbol name="NOR" x={y} y={y} out={norOnly.and(x, y).ny} label={L("NOR as NOT y", "NOT y olarak NOR")} />
               </div>
               <GateSymbol name="NOR" x={norOnly.and(x, y).nx} y={norOnly.and(x, y).ny} out={norOnly.and(x, y).out} />
             </div>
@@ -100,16 +101,17 @@ export function GatesBlock() {
 }
 
 export function HalfAdderBlock() {
+  const { L } = useLang();
   const [x, setX] = useState<Bit>(1);
   const [y, setY] = useState<Bit>(1);
   const r = halfAdder(x, y);
   return (
     <>
-      <BlockHeader title="Half adder" refs="Sec. 1-7">
-        Adds two bits. The sum is S = x ⊕ y (an XOR gate) and the carry is C = xy (an AND gate).
+      <BlockHeader title={L("Half adder", "Yarım toplayıcı")} refs="Sec. 1-7">
+        {L("Adds two bits. The sum is S = x ⊕ y (an XOR gate) and the carry is C = xy (an AND gate).", "İki biti toplar. Toplam S = x ⊕ y (bir XOR kapısı), elde ise C = xy'dir (bir AND kapısı).")}
       </BlockHeader>
       <div className="grid2">
-        <Panel title="Circuit">
+        <Panel title={L("Circuit", "Devre")}>
           <div className="row">
             <BitToggle label="x" value={x} onChange={setX} />
             <BitToggle label="y" value={y} onChange={setY} />
@@ -125,7 +127,7 @@ export function HalfAdderBlock() {
             </span>
           </div>
         </Panel>
-        <Panel title="Truth table">
+        <Panel title={L("Truth table", "Doğruluk tablosu")}>
           <Truth head={['x', 'y', 'C', 'S']} rows={B.flatMap((a) => B.map((b) => [a, b, halfAdder(a, b).c, halfAdder(a, b).s]))} hit={x * 2 + y} />
         </Panel>
       </div>
@@ -134,6 +136,7 @@ export function HalfAdderBlock() {
 }
 
 export function FullAdderBlock() {
+  const { L } = useLang();
   const [x, setX] = useState<Bit>(1);
   const [y, setY] = useState<Bit>(0);
   const [z, setZ] = useState<Bit>(1);
@@ -141,11 +144,11 @@ export function FullAdderBlock() {
   const rows = B.flatMap((a) => B.flatMap((b) => B.map((c) => [a, b, c, fullAdder(a, b, c).c, fullAdder(a, b, c).s])));
   return (
     <>
-      <BlockHeader title="Full adder" refs="Sec. 1-7">
-        Adds three bits: S = x ⊕ y ⊕ z, C = xy + xz + yz. Built from two half adders and an OR gate: the first half adder gives S1 and C1, the second adds z to S1 and gives S and C2, and C = C1 + C2.
+      <BlockHeader title={L("Full adder", "Tam toplayıcı")} refs="Sec. 1-7">
+        {L("Adds three bits: S = x ⊕ y ⊕ z, C = xy + xz + yz. Built from two half adders and an OR gate: the first half adder gives S1 and C1, the second adds z to S1 and gives S and C2, and C = C1 + C2.", "Üç biti toplar: S = x ⊕ y ⊕ z, C = xy + xz + yz. İki yarım toplayıcı ve bir OR kapısından kurulur: birinci yarım toplayıcı S1 ve C1'i verir, ikincisi z'yi S1'e ekleyip S ve C2'yi verir; C = C1 + C2.")}
       </BlockHeader>
       <div className="grid2">
-        <Panel title="Two half adders and an OR gate">
+        <Panel title={L("Two half adders and an OR gate", "İki yarım toplayıcı ve bir OR kapısı")}>
           <div className="row">
             <BitToggle label="x" value={x} onChange={setX} />
             <BitToggle label="y" value={y} onChange={setY} />
@@ -166,7 +169,7 @@ export function FullAdderBlock() {
               </div>
               <span className="muted">→</span>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <GateSymbol name="OR" x={r.c1} y={r.c2} out={r.c} label={`OR gate: C1 + C2 = ${r.c}`} />
+                <GateSymbol name="OR" x={r.c1} y={r.c2} out={r.c} label={L(`OR gate: C1 + C2 = ${r.c}`, `OR kapısı: C1 + C2 = ${r.c}`)} />
                 <span>C = C1 + C2 = {r.c}</span>
               </div>
             </div>
@@ -176,7 +179,7 @@ export function FullAdderBlock() {
             {r.s}
           </p>
         </Panel>
-        <Panel title="Truth table">
+        <Panel title={L("Truth table", "Doğruluk tablosu")}>
           <Truth head={['x', 'y', 'z', 'C', 'S']} rows={rows} hit={x * 4 + y * 2 + z} />
         </Panel>
       </div>
@@ -185,6 +188,7 @@ export function FullAdderBlock() {
 }
 
 export function RippleAdderBlock() {
+  const { L } = useLang();
   const n = useSettings((s) => s.width);
   const [a, setA] = useWord(0b1011, n);
   const [b, setB] = useWord(0b0011, n);
@@ -192,23 +196,26 @@ export function RippleAdderBlock() {
   const r = rippleAdder(a, b, c0, n);
   return (
     <>
-      <BlockHeader title="Binary adder (ripple carry)" refs="Fig. 2-6" right={<WidthSelect />}>
-        n full adders in a chain. The carry out of each stage is the carry in of the next one, so carries propagate from right (C0) to left (C{n}).
+      <BlockHeader title={L("Binary adder (ripple carry)", "İkili toplayıcı (dalgalı elde)")} refs="Fig. 2-6" right={<WidthSelect />}>
+        {L(
+          `n full adders in a chain. The carry out of each stage is the carry in of the next one, so carries propagate from right (C0) to left (C${n}).`,
+          `Zincirlenmiş n tam toplayıcı. Her katın çıkış eldesi bir sonrakinin giriş eldesidir; bu yüzden eldeler sağdan (C0) sola (C${n}) yayılır.`,
+        )}
       </BlockHeader>
-      <Panel title="Inputs">
+      <Panel title={L("Inputs", "Girişler")}>
         <div className="row">
           <BitInput label="A" value={a} width={n} onChange={setA} />
           <BitInput label="B" value={b} width={n} onChange={setB} />
           <BitToggle label="C0" value={c0} onChange={setC0} />
         </div>
       </Panel>
-      <Panel title="Full-adder chain">
+      <Panel title={L("Full-adder chain", "Tam toplayıcı zinciri")}>
         <CarryChain width={n} rows={[{ label: 'A', value: a }, { label: 'B', value: b }]} carries={r.carries} outLabel="S" out={r.sum} stageLabel="FA" />
         <div className="row" style={{ marginTop: 12, alignItems: 'center' }}>
           <span className="result">
             S = <Word value={r.sum} width={n} />
           </span>
-          <Flag name={`C${n}`} v={r.cout} note="Output carry" />
+          <Flag name={`C${n}`} v={r.cout} note={L("Output carry", "Çıkış eldesi")} />
         </div>
       </Panel>
     </>

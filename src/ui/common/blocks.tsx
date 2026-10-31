@@ -1,18 +1,19 @@
 import { useState, type ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 import { bitAt, toSigned, trunc, type Bit } from '../../core/bits';
-import { useSettings, type Width } from '../settings';
+import { useLang, useSettings, type Width } from '../settings';
 import { Ref } from './controls';
 
 /** Section menu for a room, linking to nested routes. */
-export function RoomMenu({ base, items, label }: { base: string; items: { id: string; name: string; ref: string }[]; label: string }) {
+export function RoomMenu({ base, items, label }: { base: string; items: { id: string; name: string; nameTr: string; ref: string }[]; label: string }) {
+  const { lang, ref } = useLang();
   return (
     <nav className="room-menu" aria-label={label}>
       {items.map((s) => (
         <NavLink key={s.id} to={`${base}/${s.id}`}>
-          <span>{s.name}</span>
+          <span>{lang === 'tr' ? s.nameTr : s.name}</span>
           <span className="mono muted" style={{ fontSize: 11 }}>
-            {s.ref}
+            {ref(s.ref)}
           </span>
         </NavLink>
       ))}
@@ -37,11 +38,12 @@ export function BlockHeader({ title, refs, children, right }: { title: string; r
 
 export function WidthSelect() {
   const { width, setWidth } = useSettings();
+  const { L } = useLang();
   return (
-    <div className="seg" role="group" aria-label="Word width">
+    <div className="seg" role="group" aria-label={L('Word width', 'Kelime genişliği')}>
       {([4, 8, 16] as Width[]).map((w) => (
         <button key={w} className="mono" aria-pressed={width === w} onClick={() => setWidth(w)}>
-          {w} bits
+          {w} {L('bits', 'bit')}
         </button>
       ))}
     </div>
@@ -56,9 +58,10 @@ export function useWord(initial: number, width: number): [number, (v: number) =>
 
 /** Unsigned and signed interpretation of a word. */
 export function Interpret({ value, width }: { value: number; width: number }) {
+  const { L } = useLang();
   return (
     <span className="mono muted" style={{ fontSize: 12 }}>
-      unsigned {trunc(value, width)}, signed {toSigned(value, width) >= 0 ? '+' : ''}
+      {L('unsigned', 'işaretsiz')} {trunc(value, width)}, {L('signed', 'işaretli')} {toSigned(value, width) >= 0 ? '+' : ''}
       {toSigned(value, width)}
     </span>
   );

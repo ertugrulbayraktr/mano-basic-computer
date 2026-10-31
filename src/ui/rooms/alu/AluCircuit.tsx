@@ -3,6 +3,7 @@ import type { AluCircuit as AluData, AluStage } from '../../../core/alu/aluSteps
 import { CircuitCanvas, type Rect } from '../../circuit/CircuitCanvas';
 import { Block, Mux, muxInputY, Text, Wire, type Pt } from '../../circuit/parts';
 import { GateSymbol } from '../../common/GateSymbol';
+import { useLang } from '../../settings';
 
 /**
  * Fig. 4-13 drawn for all stages, MSB on the left. Wires show their logic value once it has
@@ -44,6 +45,7 @@ export function aluFocusRect(data: AluData, step: number): Rect {
 }
 
 export function AluCircuit({ data, step, follow = false }: { data: AluData; step: number; follow?: boolean }) {
+  const { L } = useLang();
   const n = data.width;
   const W = LEFT + n * COL + 40;
   const H = 860;
@@ -58,7 +60,7 @@ export function AluCircuit({ data, step, follow = false }: { data: AluData; step
   const bit = (b: Bit, settled: boolean) => (settled ? String(b) : '·');
 
   return (
-    <CircuitCanvas width={W} height={H} label="ALU circuit, Fig. 4-13, all stages" focus={follow ? aluFocusRect(data, step) : null}>
+    <CircuitCanvas width={W} height={H} label={L('ALU circuit, Fig. 4-13, all stages', 'ALU devresi, Şekil 4-13, tüm katlar')} focus={follow ? aluFocusRect(data, step) : null}>
       {/* Select lines shared by every stage */}
       {[
         [SEL_Y, `S1S0 = ${s1s0.toString(2).padStart(2, '0')}`],
@@ -90,12 +92,12 @@ export function AluCircuit({ data, step, follow = false }: { data: AluData; step
 
       {/* Output word and status bits */}
       <Text at={[LEFT, 768]} size={12.5} weight={600} tone="muted">
-        Output
+        {L('Output', 'Çıkış')}
       </Text>
       <Text at={[LEFT + 70, 768]} size={18} mono tone={outOn ? 'active' : 'muted'} weight={600}>
         F = {outOn ? data.stages.map((s) => s.f).reverse().join('') : '·'.repeat(n)}
       </Text>
-      <Block x={LEFT} y={790} w={n * COL - 60} h={52} on={statusOn} title="Status bits, Fig. 8-8">
+      <Block x={LEFT} y={790} w={n * COL - 60} h={52} on={statusOn} title={L('Status bits, Fig. 8-8', 'Durum bitleri, Şekil 8-8')}>
         {[
           ['C', data.status.c, `C = C${n}`],
           ['S', data.status.s, `S = F${n - 1}`],
@@ -110,7 +112,7 @@ export function AluCircuit({ data, step, follow = false }: { data: AluData; step
               </Text>
               <Text at={[LEFT + 90 + j * 250, 816]} size={12} mono tone="muted">
                 {f as string}
-                {meaningless && statusOn ? ' (meaningless)' : ''}
+                {meaningless && statusOn ? L(' (meaningless)', ' (anlamsız)') : ''}
               </Text>
             </g>
           );
@@ -144,6 +146,7 @@ function Stage({
   bit: (b: Bit, settled: boolean) => string;
 }) {
   const i = s.i;
+  const { L } = useLang();
   const done = faDone(i);
   const cinSettled = i === 0 || faDone(i - 1);
   const ym = { x: x + YMUX.dx, y: YMUX.y, w: YMUX.w, h: YMUX.h };
@@ -158,7 +161,7 @@ function Stage({
   return (
     <g>
       <Text at={[x + 130, 22]} size={12} weight={600} anchor="middle">
-        Stage {i}
+        {L('Stage', 'Kat')} {i}
       </Text>
       <Text at={[x + 130, 40]} size={12.5} mono anchor="middle" tone="muted">
         A{i} = {s.a}, B{i} = {s.b}
@@ -175,14 +178,14 @@ function Stage({
           </Text>
         </g>
       ))}
-      <Mux x={ym.x} y={ym.y} w={ym.w} h={ym.h} inputs={yLabels} selected={s1s0} on={yOn} title={`Y${i} multiplexer`} />
+      <Mux x={ym.x} y={ym.y} w={ym.w} h={ym.h} inputs={yLabels} selected={s1s0} on={yOn} title={L(`Y${i} multiplexer`, `Y${i} çoklayıcısı`)} />
       <V points={[[ym.x + ym.w, yOutY], [fa.x, yOutY]]} value={s.y} settled={yOn} />
       <Text at={[ym.x + ym.w + 6, yOutY - 9]} size={12.5} mono tone={yOn ? 'active' : 'muted'}>
         Y{i}={bit(s.y, yOn)}
       </Text>
 
       <V points={[[fa.x + 30, 50], [fa.x + 30, fa.y]]} value={s.a} settled kind="signal" />
-      <Block x={fa.x} y={fa.y} w={fa.w} h={fa.h} on={done} title={`Full adder of stage ${i}`}>
+      <Block x={fa.x} y={fa.y} w={fa.w} h={fa.h} on={done} title={L(`Full adder of stage ${i}`, `Kat ${i}'in tam toplayıcısı`)}>
         <Text at={[fa.x + fa.w / 2, fa.y + 34]} size={13} anchor="middle" weight={600}>
           FA
         </Text>
@@ -215,7 +218,7 @@ function Stage({
         return (
           <g key={g}>
             <g transform={`translate(${x + 30}, ${gy - 14.4}) scale(0.45)`} opacity={logicOn ? 1 : 0.55}>
-              <GateSymbol name={g} x={s.a} y={s.b} out={gateVals[k]} label={`${g} gate of stage ${i}`} />
+              <GateSymbol name={g} x={s.a} y={s.b} out={gateVals[k]} label={L(`${g} gate of stage ${i}`, `Kat ${i}'in ${g} kapısı`)} />
             </g>
             <Text at={[x + 26, gy]} size={11.5} mono anchor="end" tone="muted">
               {g === 'NOT' ? 'A' : 'A,B'}
@@ -224,7 +227,7 @@ function Stage({
           </g>
         );
       })}
-      <Mux x={lm.x} y={lm.y} w={lm.w} h={lm.h} inputs={['AND', 'OR', 'XOR', 'NOT']} selected={s1s0} on={logicOn} title={`Logic multiplexer of stage ${i}`} />
+      <Mux x={lm.x} y={lm.y} w={lm.w} h={lm.h} inputs={['AND', 'OR', 'XOR', 'NOT']} selected={s1s0} on={logicOn} title={L(`Logic multiplexer of stage ${i}`, `Kat ${i}'in mantık çoklayıcısı`)} />
       <V points={[[lm.x + lm.w, lm.y + lm.h / 2], [x + 186, lm.y + lm.h / 2], [x + 186, oIn(1)], [om.x, oIn(1)]]} value={s.e} settled={logicOn} />
       <Text at={[lm.x + lm.w + 4, lm.y + lm.h / 2 - 9]} size={12.5} mono tone={logicOn ? 'active' : 'muted'}>
         E{i}={bit(s.e, logicOn)}
@@ -240,7 +243,7 @@ function Stage({
       <Text at={[om.x - 18, oIn(3)]} size={12} mono anchor="end" tone={outOn && s3s2 === 3 ? 'active' : 'muted'}>
         {i === 0 ? '0' : `A${i - 1}`}={s.shl}
       </Text>
-      <Mux x={om.x} y={om.y} w={om.w} h={om.h} inputs={['D', 'E', 'shr', 'shl']} selected={s3s2} on={outOn} title={`Output multiplexer of stage ${i}`} />
+      <Mux x={om.x} y={om.y} w={om.w} h={om.h} inputs={['D', 'E', 'shr', 'shl']} selected={s3s2} on={outOn} title={L(`Output multiplexer of stage ${i}`, `Kat ${i}'in çıkış çoklayıcısı`)} />
       <V points={[[om.x + om.w, om.y + om.h / 2], [x + 262, om.y + om.h / 2], [x + 262, 712]]} value={s.f} settled={outOn} />
       <Text at={[x + 262, 724]} size={14} mono anchor="middle" weight={600} tone={outOn ? (s.f ? 'active' : 'text') : 'muted'}>
         F{i}={bit(s.f, outOn)}

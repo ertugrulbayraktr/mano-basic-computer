@@ -1,5 +1,6 @@
 import type { Bit } from '../../core/bits';
 import type { GateName } from '../../core/blocks/gates';
+import { useLang } from '../settings';
 
 const wire = (v: Bit | undefined) => (v ? 'var(--active)' : 'var(--line)');
 
@@ -8,6 +9,7 @@ const wire = (v: Bit | undefined) => (v ? 'var(--active)' : 'var(--line)');
  * their logic value.
  */
 export function GateSymbol({ name, x, y, out, label }: { name: GateName; x: Bit; y?: Bit; out: Bit; label?: string }) {
+  const { L } = useLang();
   const single = name === 'NOT';
   const bubble = name === 'NOT' || name === 'NAND' || name === 'NOR' || name === 'XNOR';
   const body = (() => {
@@ -18,7 +20,7 @@ export function GateSymbol({ name, x, y, out, label }: { name: GateName; x: Bit;
   const end = single ? 80 : name === 'AND' || name === 'NAND' ? 82 : 84;
   const outX = bubble ? end + 8 : end;
   return (
-    <svg width={120} height={64} viewBox="0 0 120 64" role="img" aria-label={label ?? `${name} gate, output ${out}`}>
+    <svg width={120} height={64} viewBox="0 0 120 64" role="img" aria-label={label ?? L(`${name} gate, output ${out}`, `${name} kapısı, çıkış ${out}`)}>
       {single ? (
         <line x1={0} x2={40} y1={32} y2={32} stroke={wire(x)} strokeWidth={2} />
       ) : (

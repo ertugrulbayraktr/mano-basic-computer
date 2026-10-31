@@ -22,22 +22,22 @@ export function logicCircuit(a: number, b: number, s1s0: number, width: number) 
  * F_i's truth-table column, read for xy = 00, 01, 10, 11, is i written in binary (MSB first).
  */
 export const LOGIC_FUNCTIONS = [
-  { f: 0, boolean: 'F0 = 0', micro: 'F ← 0', name: 'Clear' },
-  { f: 1, boolean: 'F1 = xy', micro: 'F ← A ∧ B', name: 'AND' },
-  { f: 2, boolean: "F2 = xy'", micro: "F ← A ∧ B'", name: '' },
-  { f: 3, boolean: 'F3 = x', micro: 'F ← A', name: 'Transfer A' },
-  { f: 4, boolean: "F4 = x'y", micro: "F ← A' ∧ B", name: '' },
-  { f: 5, boolean: 'F5 = y', micro: 'F ← B', name: 'Transfer B' },
-  { f: 6, boolean: 'F6 = x ⊕ y', micro: 'F ← A ⊕ B', name: 'Exclusive-OR' },
-  { f: 7, boolean: 'F7 = x + y', micro: 'F ← A ∨ B', name: 'OR' },
-  { f: 8, boolean: "F8 = (x + y)'", micro: "F ← (A ∨ B)'", name: 'NOR' },
-  { f: 9, boolean: "F9 = (x ⊕ y)'", micro: "F ← (A ⊕ B)'", name: 'Exclusive-NOR' },
-  { f: 10, boolean: "F10 = y'", micro: "F ← B'", name: 'Complement B' },
-  { f: 11, boolean: "F11 = x + y'", micro: "F ← A ∨ B'", name: '' },
-  { f: 12, boolean: "F12 = x'", micro: "F ← A'", name: 'Complement A' },
-  { f: 13, boolean: "F13 = x' + y", micro: "F ← A' ∨ B", name: '' },
-  { f: 14, boolean: "F14 = (xy)'", micro: "F ← (A ∧ B)'", name: 'NAND' },
-  { f: 15, boolean: 'F15 = 1', micro: 'F ← all 1s', name: 'Set to all 1s' },
+  { f: 0, boolean: 'F0 = 0', micro: 'F ← 0', name: 'Clear', nameTr: "Temizle" },
+  { f: 1, boolean: 'F1 = xy', micro: 'F ← A ∧ B', name: 'AND', nameTr: "AND" },
+  { f: 2, boolean: "F2 = xy'", micro: "F ← A ∧ B'", name: '', nameTr: '' },
+  { f: 3, boolean: 'F3 = x', micro: 'F ← A', name: 'Transfer A', nameTr: "A'yı aktar" },
+  { f: 4, boolean: "F4 = x'y", micro: "F ← A' ∧ B", name: '', nameTr: '' },
+  { f: 5, boolean: 'F5 = y', micro: 'F ← B', name: 'Transfer B', nameTr: "B'yi aktar" },
+  { f: 6, boolean: 'F6 = x ⊕ y', micro: 'F ← A ⊕ B', name: 'Exclusive-OR', nameTr: "Dışlayıcı OR" },
+  { f: 7, boolean: 'F7 = x + y', micro: 'F ← A ∨ B', name: 'OR', nameTr: "OR" },
+  { f: 8, boolean: "F8 = (x + y)'", micro: "F ← (A ∨ B)'", name: 'NOR', nameTr: "NOR" },
+  { f: 9, boolean: "F9 = (x ⊕ y)'", micro: "F ← (A ⊕ B)'", name: 'Exclusive-NOR', nameTr: "Dışlayıcı NOR" },
+  { f: 10, boolean: "F10 = y'", micro: "F ← B'", name: 'Complement B', nameTr: "B'nin tümleyeni" },
+  { f: 11, boolean: "F11 = x + y'", micro: "F ← A ∨ B'", name: '', nameTr: '' },
+  { f: 12, boolean: "F12 = x'", micro: "F ← A'", name: 'Complement A', nameTr: "A'nın tümleyeni" },
+  { f: 13, boolean: "F13 = x' + y", micro: "F ← A' ∨ B", name: '', nameTr: '' },
+  { f: 14, boolean: "F14 = (xy)'", micro: "F ← (A ∧ B)'", name: 'NAND', nameTr: "NAND" },
+  { f: 15, boolean: 'F15 = 1', micro: 'F ← all 1s', name: 'Set to all 1s', nameTr: "Tümünü 1 yap" },
 ] as const;
 
 /** Applies logic function F_i bitwise to A and B. */
