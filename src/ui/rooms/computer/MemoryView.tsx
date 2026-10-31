@@ -40,7 +40,7 @@ export function MemoryView() {
   return (
     <section className="panel" aria-label="Memory">
       <div className="panel-head">
-        <span className="cap">Memory · 4096 × 16</span>
+        <span className="cap">Memory, 4096 × 16</span>
         <label className="cap" style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <input type="checkbox" checked={follow} onChange={(e) => setFollow(e.target.checked)} /> follow PC
         </label>

@@ -30,7 +30,7 @@ function RegisterView({ label, value, width, next, changed }: { label: string; v
         {next !== undefined && (
           <span className="muted">
             {' '}
-            · on the next pulse → <Word value={next} width={width} />
+            (next pulse: <Word value={next} width={width} />)
           </span>
         )}
       </span>
@@ -109,7 +109,7 @@ export function ShiftRegisterBlock() {
           <div>
             <BitInput label="Register (click bits to preset)" value={reg} width={n} onChange={setReg} />
             <span className="mono muted" style={{ fontSize: 13 }}>
-              next → <Word value={next.value} width={n} /> {out !== null && <>· last serial output = {out}</>}
+              next pulse: <Word value={next.value} width={n} /> {out !== null && <>, last serial output {out}</>}
             </span>
           </div>
           <ClockButton
@@ -143,7 +143,7 @@ export function CounterBlock() {
           <div>
             <BitInput label="Count (click bits to preset)" value={reg} width={n} onChange={setReg} />
             <span className="mono muted" style={{ fontSize: 13 }}>
-              decimal {reg} · next → <Word value={next} width={n} />
+              decimal {reg}, next pulse: <Word value={next} width={n} />
               {inr && reg === 2 ** n - 1 ? ' (wraps around)' : ''}
             </span>
           </div>

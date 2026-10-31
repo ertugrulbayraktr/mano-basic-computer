@@ -52,10 +52,10 @@ export function AluCircuitPage() {
         <BitToggle label="Cin" value={cin} onChange={change(setCin)} />
         <span style={{ display: 'flex', gap: 4, alignSelf: 'flex-end', marginLeft: 8 }}>
           <button className="btn" onClick={() => { setPlaying(false); setStep(Math.max(0, step - 1)); }} disabled={step === 0}>
-            ‹ Back
+            Back
           </button>
           <button className="btn primary" onClick={() => { setPlaying(false); setStep(Math.min(last, step + 1)); }} disabled={step === last}>
-            Step ›
+            Step
           </button>
           <button className="btn" onClick={() => { if (step >= last) setStep(0); setPlaying(!playing); }}>
             {playing ? 'Pause' : step >= last ? 'Replay' : 'Play'}
@@ -78,7 +78,7 @@ export function AluCircuitPage() {
         <div className="stage">
           <AluCircuit data={data} step={step} />
           <p className="expect">
-            <b>{data.operation}</b> · all {WIDTH} stages share the select lines; the carry ripples from stage 0 to stage {WIDTH - 1}. More detail on each part:{' '}
+            <b>{data.operation}.</b> All {WIDTH} stages share the select lines; the carry ripples from stage 0 to stage {WIDTH - 1}. More detail on each part:{' '}
             <Link to="/lab/arithmetic">arithmetic circuit</Link>, <Link to="/lab/logic">logic circuit</Link>, <Link to="/lab/status">status bits</Link>.
           </p>
         </div>
@@ -114,7 +114,7 @@ export function AluCircuitPage() {
           </section>
           <section className="panel" aria-label="Table 4-8">
             <div className="panel-head">
-              <span className="cap">Table 4-8 · click a row</span>
+              <span className="cap">Function table: click a row to choose it</span>
               <Ref>Table 4-8</Ref>
             </div>
             <table className="data" style={{ width: '100%' }}>

@@ -82,7 +82,7 @@ export function IODevices() {
       </label>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <span style={{ fontSize: 14, color: 'var(--text-2)', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          Printer ← OUTR · FGO returns to 1 after
+          Printer ← OUTR. FGO returns to 1 after
           <input
             className="input mono"
             type="number"
@@ -191,7 +191,7 @@ export function AluDialog({ open, onClose }: { open: boolean; onClose: () => voi
         </span>
         <span style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           <Link to="/alu" className="btn" onClick={onClose}>
-            Open the ALU circuit (Fig. 4-13) ›
+            Open the ALU circuit (Fig. 4-13)
           </Link>
           <button className="btn primary" onClick={onClose}>
             Close

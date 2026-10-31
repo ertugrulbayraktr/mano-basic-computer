@@ -7,7 +7,7 @@ import { Ref } from './controls';
 /** Section menu for a room, linking to nested routes. */
 export function RoomMenu({ base, items, label }: { base: string; items: { id: string; name: string; ref: string }[]; label: string }) {
   return (
-    <nav className="panel room-menu" aria-label={label}>
+    <nav className="room-menu" aria-label={label}>
       {items.map((s) => (
         <NavLink key={s.id} to={`${base}/${s.id}`}>
           <span>{s.name}</span>
@@ -58,7 +58,7 @@ export function useWord(initial: number, width: number): [number, (v: number) =>
 export function Interpret({ value, width }: { value: number; width: number }) {
   return (
     <span className="mono muted" style={{ fontSize: 12 }}>
-      unsigned {trunc(value, width)} · signed {toSigned(value, width) >= 0 ? '+' : ''}
+      unsigned {trunc(value, width)}, signed {toSigned(value, width) >= 0 ? '+' : ''}
       {toSigned(value, width)}
     </span>
   );

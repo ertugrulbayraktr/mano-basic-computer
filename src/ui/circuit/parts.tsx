@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 
 export type Pt = [number, number];
 
-const color = (on?: boolean, changed?: boolean) => (changed ? 'var(--changed)' : on ? 'var(--active)' : 'var(--wire)');
+const color = (on?: boolean, changed?: boolean) => (changed ? 'var(--ink)' : on ? 'var(--active)' : 'var(--wire)');
 
 /** A polyline wire. `kind` sets the thickness: control signal, data path, or the bus itself. */
 export function Wire({
@@ -65,7 +65,8 @@ export function Text({
   tone?: 'text' | 'muted' | 'active' | 'changed';
   baseline?: 'middle' | 'auto' | 'hanging';
 }) {
-  const fill = { text: 'var(--text)', muted: 'var(--muted)', active: 'var(--active)', changed: 'var(--changed)' }[tone];
+  // A changed value sits on a highlighter swatch (see Block), so it is drawn in ink.
+  const fill = { text: 'var(--ink)', muted: 'var(--muted)', active: 'var(--active)', changed: 'var(--ink)' }[tone];
   return (
     <text
       x={at[0]}
@@ -123,8 +124,8 @@ export function Block({
         y={y}
         width={w}
         height={h}
-        rx={6}
-        fill={changed ? 'var(--changed-soft)' : on ? 'var(--active-soft)' : 'var(--surface)'}
+        rx={3}
+        fill={changed ? 'var(--highlight)' : on ? 'var(--active-soft)' : 'var(--surface)'}
         stroke={color(on, changed)}
         strokeWidth={on || changed ? 1.6 : 1.2}
         strokeDasharray={dashed ? '5 4' : undefined}
@@ -193,7 +194,7 @@ export function Mux({
         style={{ transition: 'fill 160ms, stroke 160ms' }}
       />
       {inputs.map((_, k) => (
-        <Text key={k} at={[x + 4, inY(k)]} size={8.5} mono tone={on && selected === k ? 'active' : 'muted'} weight={on && selected === k ? 600 : 400}>
+        <Text key={k} at={[x + 4, inY(k)]} size={11.5} mono tone={on && selected === k ? 'active' : 'muted'} weight={on && selected === k ? 600 : 400}>
           {k}
         </Text>
       ))}
@@ -206,7 +207,7 @@ export function Mux({
           strokeDasharray="3 2"
         />
       )}
-      <Text at={[x + w / 2 + 3, y + h - 14]} size={8} anchor="middle" tone="muted">
+      <Text at={[x + w / 2 + 3, y + h - 14]} size={12.5} anchor="middle" tone="muted">
         MUX
       </Text>
     </g>
@@ -223,7 +224,7 @@ export function Pin({ at, name, on, side = 'top' }: { at: Pt; name: string; on?:
   return (
     <g>
       <Wire points={[end, at]} on={on} />
-      <Text at={side === 'top' ? [x, y - 18] : [x - 16, y]} size={9.5} anchor={side === 'top' ? 'middle' : 'end'} mono tone={on ? 'active' : 'muted'} weight={on ? 600 : 400}>
+      <Text at={side === 'top' ? [x, y - 18] : [x - 16, y]} size={12.5} anchor={side === 'top' ? 'middle' : 'end'} mono tone={on ? 'active' : 'muted'} weight={on ? 600 : 400}>
         {name}
       </Text>
     </g>

@@ -20,7 +20,7 @@ export function MemoryBlock() {
       <BlockHeader title="Memory unit" refs="Fig. 2-12" right={<WidthSelect />}>
         m words of n bits each. k address lines select one word, with 2^k = m. Read copies the selected word to the data output; Write stores the data input in it.
       </BlockHeader>
-      <Panel title={`${m} × ${n} memory · k = ${k}`}>
+      <Panel title={`${m} × ${n} memory, k = ${k}`}>
         <div className="row" style={{ alignItems: 'flex-end' }}>
           <div className="seg" role="group" aria-label="Address bits k">
             {[2, 3, 4].map((x) => (

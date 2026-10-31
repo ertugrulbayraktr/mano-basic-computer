@@ -8,8 +8,8 @@ import { BasicComputerRoom } from './rooms/computer/BasicComputerRoom';
 import './app.css';
 
 const MAIN = [
-  { to: '/computer', name: 'Basic Computer', chapters: 'Ch. 5-6 · the whole computer as a circuit' },
-  { to: '/alu', name: 'ALU', chapters: 'Fig. 4-13 · the arithmetic logic shift unit as a circuit' },
+  { to: '/computer', name: 'Basic Computer', chapters: 'Ch. 5-6: the whole computer as a circuit' },
+  { to: '/alu', name: 'ALU', chapters: 'Fig. 4-13: the arithmetic logic shift unit as a circuit' },
 ];
 const MORE = [
   { to: '/blocks', name: 'Building blocks', chapters: 'Ch. 1-2, Sec. 4-1 to 4-3' },
@@ -32,8 +32,8 @@ export function App() {
       <div className="shell">
         <header className="topbar">
           <a href="#/computer" className="brand">
-            <span className="brand-name">MANO</span>
-            <span className="cap">Basic Computer Simulator</span>
+            <span className="brand-name">Mano</span>
+            <span className="brand-sub">the Basic Computer, clock by clock</span>
           </a>
           <nav aria-label="Sections" className="rooms">
             {MAIN.map((r) => (

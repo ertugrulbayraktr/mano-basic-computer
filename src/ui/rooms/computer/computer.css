@@ -1,57 +1,19 @@
-.dp-box {
-  position: absolute;
-  left: 20px;
-  width: 300px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--box);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-}
-.alu-button {
-  height: 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--text);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  padding: 0 10px;
-  background: var(--box);
-  cursor: pointer;
-}
-.alu-button:hover {
-  border-color: var(--active);
-}
-.e-box {
-  flex: 0 0 60px;
-  height: 46px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--box);
-  color: var(--text);
-  cursor: pointer;
-}
-
+/* ---- Toolbar ---- */
 .cbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 8px 10px;
 }
-
-.state-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px 32px;
-  align-items: center;
+.cbar .sep {
+  width: 1px;
+  align-self: stretch;
+  background: var(--rule);
+  margin: 2px 4px;
 }
-.state-strip .group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.btn-group {
+  display: inline-flex;
+  gap: 4px;
 }
 .chips {
   display: flex;
@@ -59,65 +21,249 @@
   gap: 3px;
 }
 
-.cols {
+/* ---- Workbench: the circuit on the left, the notes on the right ---- */
+.computer {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 10px;
 }
-.col {
-  flex: 1 1 400px;
+.workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  height: calc(100vh - 128px);
+  min-height: 600px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.stage {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.side {
+  border-left: 1px solid var(--rule);
+  overflow-y: auto;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
-.col.narrow {
-  flex: 1 1 320px;
+.side > .panel,
+.side > section {
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid var(--rule);
+  padding: 16px 18px;
 }
-
-.rtl {
-  font-family: var(--mono);
-  font-size: 22px;
-  line-height: 1.3;
+.canvas-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: var(--paper);
 }
-.rtl .cf {
-  color: var(--active);
+.canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
 }
-
-.sig-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
+.canvas:active {
+  cursor: grabbing;
 }
-.sig {
-  border: 1px solid var(--line-soft);
-  border-radius: 4px;
-  padding: 10px 12px;
+.canvas-tools {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
   display: flex;
-  flex-direction: column;
   gap: 4px;
 }
+.expect {
+  margin: 0;
+  padding: 9px 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  border-top: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+@media (max-width: 960px) {
+  .workbench {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .stage {
+    height: 72vh;
+  }
+  .side {
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+  }
+}
 
+/* ---- The pulse and its sub-steps ---- */
+.step-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.step-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+.step-meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+.rtl-sm {
+  font-family: var(--mono);
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.rtl-sm .cf {
+  font-weight: 600;
+}
+.substeps {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  counter-reset: substep;
+}
+.substeps li {
+  position: relative;
+  padding-left: 28px;
+}
+/* A thin rail joins the steps of one pulse. */
+.substeps li::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--rule);
+}
+.substeps li:first-child::before {
+  top: 14px;
+}
+.substeps li:last-child::before {
+  bottom: calc(100% - 14px);
+}
+.substep-head {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: none;
+  padding: 5px 0;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: left;
+}
+.substep-head:hover {
+  color: var(--ink);
+}
+.substep-no {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  border: 1px solid var(--rule-strong);
+  background: var(--paper);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+.substeps li.done .substep-head {
+  color: var(--ink-2);
+}
+.substeps li.done .substep-no {
+  border-color: var(--ink-2);
+  color: var(--ink-2);
+}
+.substeps li.current .substep-head {
+  color: var(--ink);
+  font-weight: 700;
+}
+.substeps li.current .substep-no {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.substep-text {
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.substep-text p {
+  margin: 0 0 4px;
+}
+.substeps li.done .substep-text {
+  color: var(--muted);
+}
+.why {
+  border-top: 1px solid var(--rule);
+  margin-top: 6px;
+  padding-top: 10px;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.why p {
+  margin: 4px 0 0;
+}
+
+/* ---- Tabs in the side column ---- */
+.tabs {
+  display: flex;
+  gap: 18px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--rule);
+  flex: none;
+}
+.tabs button {
+  border: 0;
+  background: none;
+  padding: 10px 0 8px;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tabs button[aria-selected='true'] {
+  color: var(--ink);
+  font-weight: 600;
+  border-bottom-color: var(--ink);
+}
+
+/* ---- Memory, history, devices ---- */
 .memory {
   font-family: var(--mono);
   font-size: 13px;
 }
 .mem-row {
   display: grid;
-  grid-template-columns: 22px 34px auto auto minmax(0, 1fr);
+  grid-template-columns: 22px 30px auto auto minmax(0, 1fr);
   gap: 8px;
   align-items: center;
   height: 28px;
   padding: 0 6px;
-  border-radius: 3px;
 }
 .mem-row.ar {
-  background: var(--active-soft);
-  outline: 1px solid rgb(37 99 235 / 0.5);
+  box-shadow: inset 2px 0 0 var(--signal);
+  background: var(--signal-soft);
 }
 .mem-row.written {
-  background: var(--changed-soft);
+  background: var(--highlight-soft);
 }
 .bp {
   width: 18px;
@@ -133,10 +279,13 @@
 }
 .bp::after {
   content: '';
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  border: 1px solid var(--line);
+  border: 1px solid var(--rule-strong);
+}
+.bp:hover::after {
+  border-color: var(--alert);
 }
 .bp[aria-pressed='true']::after {
   background: var(--alert);
@@ -146,216 +295,57 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 220px;
+  max-height: 320px;
   overflow: auto;
   font-family: var(--mono);
   font-size: 13px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 .history li {
   display: grid;
-  grid-template-columns: 48px 40px 48px minmax(0, 1fr) auto;
+  grid-template-columns: 40px 36px 44px minmax(0, 1fr) auto;
   gap: 10px;
   padding: 3px 6px;
-  border-radius: 3px;
 }
 .history li.current {
-  background: var(--active-soft);
+  background: var(--signal-soft);
 }
 .printer {
   min-height: 72px;
   max-height: 160px;
   overflow: auto;
-  background: var(--surface-2);
-  border: 1px solid var(--line-soft);
-  border-radius: 4px;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
   padding: 10px 12px;
-  color: var(--active);
+  color: var(--ink);
   font-family: var(--mono);
   font-size: 14px;
   white-space: pre-wrap;
   word-break: break-all;
 }
 
-dialog.modal {
-  background: var(--panel-solid);
-  color: var(--text);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 20px;
-  max-width: min(920px, calc(100vw - 32px));
-  width: 100%;
-}
-dialog.modal::backdrop {
-  background: rgb(15 23 42 / 0.35);
+/* Used by the ALU lab sections. */
+.sig {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-/* ---- Circuit workbench ---- */
-.computer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.workbench {
-  display: flex;
-  gap: 12px;
-  align-items: stretch;
-  flex-wrap: wrap;
-}
-.stage {
-  flex: 999 1 640px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.side {
-  flex: 1 1 340px;
-  max-width: 400px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.canvas-wrap {
-  position: relative;
-  height: calc(100vh - 150px);
-  min-height: 560px;
-  background: var(--surface);
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-.canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-}
-.canvas:active {
-  cursor: grabbing;
-}
-.canvas-tools {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  display: flex;
-  gap: 4px;
-}
-.expect {
-  margin: 0;
-  font-size: 13px;
-  color: var(--text-2);
-}
-.btn-group {
-  display: inline-flex;
-  gap: 4px;
-}
-.step-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.rtl-sm {
-  font-size: 14px;
-  line-height: 1.4;
-}
-.rtl-sm .cf {
-  color: var(--active);
-  font-weight: 600;
-}
-.substeps {
-  list-style: none;
-  margin: 8px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.substep-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  border: 0;
-  background: none;
-  padding: 6px 4px;
-  font-weight: 500;
-  color: var(--muted);
-  cursor: pointer;
-  text-align: left;
+dialog.modal {
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--rule-strong);
   border-radius: 6px;
+  padding: 22px 24px;
+  max-width: min(960px, calc(100vw - 32px));
+  width: 100%;
+  box-shadow: 0 24px 48px -12px rgb(16 24 40 / 0.25);
 }
-.substep-head:hover {
-  background: var(--surface-2);
-}
-.substep-no {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: 1px solid var(--line);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  flex: none;
-}
-.substeps li.done .substep-head {
-  color: var(--text-2);
-}
-.substeps li.done .substep-no {
-  background: var(--surface-2);
-}
-.substeps li.current .substep-head {
-  color: var(--active);
-  font-weight: 600;
-}
-.substeps li.current .substep-no {
-  background: var(--active);
-  border-color: var(--active);
-  color: #fff;
-}
-.substep-text {
-  margin: 0 0 6px 32px;
-  font-size: 13px;
-  color: var(--text-2);
-}
-.substep-text p {
-  margin: 0 0 4px;
-}
-.substeps li.done .substep-text {
-  color: var(--muted);
-}
-.why {
-  border-top: 1px solid var(--line-soft);
-  padding-top: 8px;
-  font-size: 13px;
-  color: var(--text-2);
-}
-.why p {
-  margin: 4px 0 0;
-}
-.tabs {
-  display: flex;
-  gap: 2px;
-  border-bottom: 1px solid var(--line-soft);
-}
-.tabs button {
-  border: 0;
-  background: none;
-  padding: 8px 10px;
-  color: var(--muted);
-  cursor: pointer;
-  font-weight: 500;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-}
-.tabs button[aria-selected='true'] {
-  color: var(--active);
-  border-bottom-color: var(--active);
+dialog.modal::backdrop {
+  background: rgb(35 39 47 / 0.3);
 }

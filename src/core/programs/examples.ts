@@ -18,7 +18,7 @@ export interface HexExample {
 export const HEX_EXAMPLES: HexExample[] = [
   {
     id: 'direct-add',
-    title: '1 · Direct ADD',
+    title: '1. Direct ADD',
     summary: 'ADD 205 with AC = 0007 and M[205] = 0003.',
     reference: 'Sec. 5-5, Table 5-6',
     mem: [
@@ -32,7 +32,7 @@ export const HEX_EXAMPLES: HexExample[] = [
   },
   {
     id: 'indirect-add',
-    title: '2 · Indirect ADD',
+    title: '2. Indirect ADD',
     summary: 'ADD 300 I: M[300] holds the effective address 450.',
     reference: 'Fig. 5-2, Table 5-6',
     mem: [
@@ -46,7 +46,7 @@ export const HEX_EXAMPLES: HexExample[] = [
   },
   {
     id: 'indirect-lda',
-    title: '3 · Indirect LDA',
+    title: '3. Indirect LDA',
     summary: 'LDA 300 I loads M[M[300]] into AC.',
     reference: 'Table 5-6',
     mem: [
@@ -60,7 +60,7 @@ export const HEX_EXAMPLES: HexExample[] = [
   },
   {
     id: 'register-reference',
-    title: '4 · Register-reference INC',
+    title: '4. Register-reference INC',
     summary: 'INC (7020) executes entirely in T3.',
     reference: 'Table 5-6',
     mem: [
@@ -72,7 +72,7 @@ export const HEX_EXAMPLES: HexExample[] = [
   },
   {
     id: 'bsa',
-    title: '5 · BSA call and return',
+    title: '5. BSA call and return',
     summary: 'BSA 135 saves the return address at 135; the subroutine returns with BUN 135 I.',
     reference: 'Fig. 5-10',
     mem: [
@@ -87,7 +87,7 @@ export const HEX_EXAMPLES: HexExample[] = [
   },
   {
     id: 'isz',
-    title: '6 · ISZ loop counter',
+    title: '6. ISZ loop counter',
     summary: 'Two ISZ 0A0 on M[0A0] = FFFE; the second one skips the INC at 012.',
     reference: 'Table 5-6',
     mem: [

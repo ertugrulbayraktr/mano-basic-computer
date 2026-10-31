@@ -7,7 +7,7 @@ import { BASE_LABEL, fmt, parseWord } from './format';
 export function BaseSwitch({ allowSigned = false }: { allowSigned?: boolean }) {
   const { base, setBase, signed, setSigned } = useSettings();
   return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+    <div className="base-switch" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
       <div className="seg" role="group" aria-label="Number base">
         {(['hex', 'bin', 'dec'] as Base[]).map((b) => (
           <button key={b} className="mono" aria-pressed={base === b} onClick={() => setBase(b)}>

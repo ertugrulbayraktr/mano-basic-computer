@@ -35,7 +35,7 @@ export function AdderSubtractorBlock() {
           <BitToggle label="M (mode)" value={m} onChange={setM} />
         </div>
       </Panel>
-      <Panel title={`Full-adder chain · B ⊕ M = ${bin(r.bIn, n)}`} refs={<Ref>Fig. 4-7</Ref>}>
+      <Panel title={`Full-adder chain, B ⊕ M = ${bin(r.bIn, n)}`} refs={<Ref>Fig. 4-7</Ref>}>
         <CarryChain width={n} rows={[{ label: 'A', value: a }, { label: 'B⊕M', value: r.bIn }]} carries={r.carries} outLabel="S" out={r.sum} stageLabel="FA" />
       </Panel>
       <Panel title="Result and the flag that matters">
@@ -48,7 +48,7 @@ export function AdderSubtractorBlock() {
         </div>
         <div className="grid2" style={{ marginTop: 12 }}>
           <div className="sig" style={{ border: '1px solid var(--line-soft)', borderRadius: 4, padding: 12 }}>
-            <span className="cap">Unsigned interpretation · watch C{n}</span>
+            <span className="cap">Unsigned interpretation: watch C{n}</span>
             <p style={{ margin: '6px 0 0' }}>
               {m
                 ? `C${n} = ${r.c}: ${r.c ? 'A ≥ B, no borrow; the result is correct.' : 'A < B; the unsigned result wrapped around (borrow).'}`
@@ -56,7 +56,7 @@ export function AdderSubtractorBlock() {
             </p>
           </div>
           <div className="sig" style={{ border: '1px solid var(--line-soft)', borderRadius: 4, padding: 12 }}>
-            <span className="cap">Signed (2's complement) interpretation · watch V</span>
+            <span className="cap">Signed (2's complement) interpretation: watch V</span>
             <p style={{ margin: '6px 0 0' }}>
               V = C{n - 1} ⊕ C{n} = {r.carries[n - 1]} ⊕ {r.carries[n]} = {r.v}: {r.v ? 'overflow, the signed result is wrong.' : 'no overflow, the signed result is correct.'}
             </p>
@@ -124,7 +124,7 @@ export function ArithmeticBlock() {
           </span>
         </p>
       </Panel>
-      <Panel title="Table 4-4 · Arithmetic circuit function table" refs={<Ref>Table 4-4</Ref>}>
+      <Panel title="Arithmetic circuit function table" refs={<Ref>Table 4-4</Ref>}>
         <div className="scroll-x">
           <table className="data" style={{ width: '100%' }}>
             <thead>
@@ -182,7 +182,7 @@ export function LogicBlock() {
       <Panel title="All four gates compute; the MUX passes one">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
           {LOGIC_OPS.map((op, i) => (
-            <Candidate key={op.op} title={`S1S0 = ${bin(i, 2)} · ${op.op}`} op={op.microoperation} value={<Word value={r.candidates[i]} width={n} />} selected={i === s} />
+            <Candidate key={op.op} title={`S1S0 = ${bin(i, 2)}: ${op.op}`} op={op.microoperation} value={<Word value={r.candidates[i]} width={n} />} selected={i === s} />
           ))}
         </div>
       </Panel>
@@ -353,7 +353,7 @@ export function ShifterBlock() {
           <BitToggle label="IL (serial in, left shift)" value={il} onChange={setIl} />
         </div>
       </Panel>
-      <Panel title={`2×1 multiplexers · S = ${s} selects input ${s}`}>
+      <Panel title={`2×1 multiplexers, S = ${s} selects input ${s}`}>
         <div className="scroll-x">
           <div style={{ display: 'flex', gap: 6, fontFamily: 'var(--mono)', fontSize: n > 8 ? 11 : 13, minWidth: 'min-content' }}>
             {r.muxes
@@ -434,12 +434,12 @@ export function AluBlock() {
           <BitToggle label="Cin" value={cin} onChange={setCin} />
         </div>
       </Panel>
-      <Panel title={`Every stage computes all four · the output MUX passes S3S2 = ${bin(s3s2, 2)}`}>
+      <Panel title={`Every stage computes all four; the output MUX passes S3S2 = ${bin(s3s2, 2)}`}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10 }}>
-          <Candidate title="00 · Arithmetic" op={r.arithmetic.microoperation.replace('D =', 'F =')} value={<Word value={r.candidates.arithmetic} width={n} />} selected={s3s2 === 0} />
-          <Candidate title="01 · Logic" op={r.logic.microoperation.replace('E =', 'F =')} value={<Word value={r.candidates.logic} width={n} />} selected={s3s2 === 1} />
-          <Candidate title="10 · Shift right" op="F = shr A" value={<Word value={r.candidates.shr} width={n} />} selected={s3s2 === 2} />
-          <Candidate title="11 · Shift left" op="F = shl A" value={<Word value={r.candidates.shl} width={n} />} selected={s3s2 === 3} />
+          <Candidate title="00: arithmetic" op={r.arithmetic.microoperation.replace('D =', 'F =')} value={<Word value={r.candidates.arithmetic} width={n} />} selected={s3s2 === 0} />
+          <Candidate title="01: logic" op={r.logic.microoperation.replace('E =', 'F =')} value={<Word value={r.candidates.logic} width={n} />} selected={s3s2 === 1} />
+          <Candidate title="10: shift right" op="F = shr A" value={<Word value={r.candidates.shr} width={n} />} selected={s3s2 === 2} />
+          <Candidate title="11: shift left" op="F = shl A" value={<Word value={r.candidates.shl} width={n} />} selected={s3s2 === 3} />
         </div>
         <div className="row" style={{ marginTop: 14, alignItems: 'center' }}>
           <span className="result">
@@ -452,7 +452,7 @@ export function AluBlock() {
           {!r.carryMeaningful && <span className="muted" style={{ fontSize: 13 }}>C and V are meaningless for logic and shift operations.</span>}
         </div>
       </Panel>
-      <Panel title="Table 4-8 · Function table for the ALU" refs={<Ref>Table 4-8</Ref>}>
+      <Panel title="Function table for the ALU" refs={<Ref>Table 4-8</Ref>}>
         <div className="scroll-x">
           <table className="data" style={{ width: '100%' }}>
             <thead>

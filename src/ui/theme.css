@@ -1,33 +1,47 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;500;600;700&family=Overpass+Mono:wght@400;500;600&display=swap');
 
 /*
- * Light, modern minimal design language.
- * Blue = active signal, orange = value changed on this clock edge, light gray = idle.
+ * Visual language: a circuit drawn in graphite ink on white paper.
+ * Signal green marks a wire carrying 1 / an active control signal (the logic-simulator
+ * convention). A yellow highlighter marks values that changed on the clock edge, the way a
+ * student marks a textbook. Ink is used for UI chrome; green only ever means "signal".
  */
 :root {
-  --ground: #ffffff;
-  --surface: #ffffff;
-  --surface-2: #f8fafc;
-  --panel: #ffffff;
-  --panel-solid: #ffffff;
-  --box: #ffffff;
-  --line: #d4d8de;
-  --line-soft: #e8ebef;
-  --wire: #c3c9d1;
-  --grid: #e9ecf0;
-  --text: #111827;
-  --text-2: #374151;
-  --muted: #6b7280;
-  --active: #2563eb;
+  --paper: #ffffff;
+  --paper-2: #f6f7f8;
+  --ink: #23272f;
+  --ink-2: #4a515c;
+  --muted: #6b7380;
+  --rule: #e3e6ea;
+  --rule-strong: #cdd2d8;
+  --wire: #c4c9d0;
+  --grid: #e7eaee;
+  --signal: #13914b;
+  --signal-soft: #e7f5ec;
+  --highlight: #ffe95c;
+  --highlight-soft: #fff6b8;
+  --changed: #7a5200;
+  --alert: #b42318;
+
+  /* Names used across components. */
+  --ground: var(--paper);
+  --surface: var(--paper);
+  --surface-2: var(--paper-2);
+  --panel: var(--paper);
+  --panel-solid: var(--paper);
+  --box: var(--paper);
+  --line: var(--rule-strong);
+  --line-soft: var(--rule);
+  --text: var(--ink);
+  --text-2: var(--ink-2);
+  --active: var(--signal);
   --active-ink: #ffffff;
-  --active-soft: #eff4ff;
-  --changed: #ea580c;
-  --changed-soft: #fff4ed;
-  --alert: #dc2626;
-  --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
-  --radius: 8px;
-  --shadow: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.06);
+  --active-soft: var(--signal-soft);
+  --changed-soft: var(--highlight-soft);
+
+  --sans: 'Overpass', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'Overpass Mono', ui-monospace, 'Cascadia Mono', monospace;
+  --radius: 3px;
   --beat: 350ms;
   color-scheme: light;
 }
@@ -38,17 +52,22 @@
 
 body {
   margin: 0;
-  background: var(--surface-2);
-  color: var(--text);
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--sans);
   font-size: 14px;
-  line-height: 1.45;
+  line-height: 1.5;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
 a {
-  color: var(--active);
+  color: var(--ink);
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 3px;
+}
+a:hover {
+  text-decoration-color: var(--ink);
 }
 
 button,
@@ -60,7 +79,7 @@ textarea {
 }
 
 :focus-visible {
-  outline: 2px solid var(--active);
+  outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
 
@@ -68,28 +87,27 @@ textarea {
   font-family: var(--mono);
 }
 
+/* Small label: sentence case, medium weight, quiet. */
 .cap {
   font-family: var(--sans);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--ink-2);
 }
 
 .ref {
-  font-family: var(--mono);
-  font-size: 11px;
+  font-family: var(--sans);
+  font-size: 12px;
   color: var(--muted);
   cursor: help;
+  white-space: nowrap;
 }
 
 .panel {
-  background: var(--panel);
-  border: 1px solid var(--line-soft);
+  background: var(--paper);
+  border: 1px solid var(--rule);
   border-radius: var(--radius);
   padding: 16px;
-  box-shadow: var(--shadow);
 }
 
 .panel-head {
@@ -103,44 +121,49 @@ textarea {
 .btn {
   font-family: var(--sans);
   font-weight: 500;
-  font-size: 13px;
-  min-height: 34px;
+  font-size: 13.5px;
+  min-height: 32px;
   padding: 0 12px;
-  border-radius: 6px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--text);
+  border-radius: var(--radius);
+  border: 1px solid var(--rule-strong);
+  background: var(--paper);
+  color: var(--ink);
   display: inline-flex;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  box-shadow: 0 1px 1px rgb(16 24 40 / 0.04);
   text-decoration: none;
+  white-space: nowrap;
 }
 .btn:hover:not(:disabled) {
-  background: var(--surface-2);
+  border-color: var(--ink-2);
 }
 .btn:disabled {
-  opacity: 0.45;
+  color: var(--muted);
+  border-color: var(--rule);
   cursor: not-allowed;
 }
 .btn.primary {
-  background: var(--active);
-  color: var(--active-ink);
-  border-color: var(--active);
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
 }
 .btn.primary:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: #000;
+}
+.btn.primary:disabled {
+  background: var(--rule-strong);
+  border-color: var(--rule-strong);
+  color: #fff;
 }
 .btn.small {
-  min-height: 28px;
-  padding: 0 9px;
-  font-size: 12px;
+  min-height: 26px;
+  padding: 0 8px;
+  font-size: 12.5px;
 }
 .btn[aria-pressed='true'] {
-  background: var(--active-soft);
-  border-color: var(--active);
-  color: var(--active);
+  background: var(--paper-2);
+  border-color: var(--ink);
 }
 
 .chip {
@@ -148,69 +171,55 @@ textarea {
   font-size: 12px;
   min-width: 30px;
   height: 24px;
-  border-radius: 5px;
-  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--muted);
+  color: var(--ink-2);
   padding: 0 6px;
-  background: var(--surface);
+  background: var(--paper);
 }
 .chip.on {
-  background: var(--active);
-  color: var(--active-ink);
-  border-color: var(--active);
-  font-weight: 600;
-}
-.chip.next {
-  border-style: dashed;
-  border-color: var(--active);
-  color: var(--active);
+  background: var(--signal);
+  color: #fff;
+  border-color: var(--signal);
 }
 .chip.changed {
-  border-color: var(--changed);
-  color: var(--changed);
-}
-.chip.ctl {
-  height: 18px;
-  min-width: 0;
-  font-size: 10px;
-  padding: 0 4px;
-}
-.chip.ctl.lit {
-  color: var(--changed);
-  border-color: var(--changed);
+  background: var(--highlight);
+  border-color: var(--highlight);
+  color: var(--ink);
 }
 
 .seg {
   display: inline-flex;
-  border: 1px solid var(--line);
-  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
   overflow: hidden;
-  background: var(--surface);
+  background: var(--paper);
 }
 .seg button {
-  min-height: 30px;
+  min-height: 28px;
   padding: 0 10px;
   border: 0;
   background: transparent;
-  color: var(--muted);
+  color: var(--ink-2);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
 }
 .seg button + button {
-  border-left: 1px solid var(--line-soft);
+  border-left: 1px solid var(--rule);
 }
 .seg button[aria-pressed='true'],
 .seg button[aria-checked='true'] {
-  background: var(--active-soft);
-  color: var(--active);
-  font-weight: 600;
+  background: var(--ink);
+  color: #fff;
 }
 
 .changed-value {
-  color: var(--changed);
+  color: var(--ink);
+  background: var(--highlight);
+  padding: 0 2px;
 }
 .old-value {
   color: var(--muted);
@@ -219,30 +228,30 @@ textarea {
 }
 
 .input {
-  min-height: 32px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  color: var(--text);
+  min-height: 30px;
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  color: var(--ink);
   padding: 0 8px;
 }
 
 .bit {
   font-family: var(--mono);
   font-size: 15px;
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  border: 1px solid var(--line);
-  background: var(--surface);
+  width: 32px;
+  height: 34px;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule-strong);
+  background: var(--paper);
   color: var(--muted);
   cursor: pointer;
   padding: 0;
 }
 .bit[aria-pressed='true'] {
-  background: var(--active-soft);
-  color: var(--active);
-  border-color: var(--active);
+  background: var(--signal);
+  color: #fff;
+  border-color: var(--signal);
   font-weight: 600;
 }
 .bit:disabled {
@@ -256,31 +265,28 @@ table.data {
 }
 table.data th {
   text-align: left;
-  font-weight: 500;
-  color: var(--muted);
+  font-weight: 600;
+  color: var(--ink-2);
   padding: 5px 10px;
   font-family: var(--sans);
   font-size: 12px;
+  border-bottom: 1px solid var(--rule-strong);
 }
 table.data td {
-  padding: 5px 10px;
-  border-top: 1px solid var(--line-soft);
-  color: var(--text-2);
+  padding: 4px 10px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-2);
 }
 table.data tr.hit td {
-  background: var(--active-soft);
-  color: var(--text);
-}
-table.data tr.hit td:first-child {
-  box-shadow: inset 2px 0 0 var(--active);
+  background: var(--highlight-soft);
+  color: var(--ink);
 }
 
 .notice {
-  border: 1px solid #fed7aa;
-  background: var(--changed-soft);
-  border-radius: 6px;
+  border-left: 3px solid var(--highlight);
+  background: var(--highlight-soft);
   padding: 8px 12px;
-  color: var(--text);
+  color: var(--ink);
   font-size: 13px;
 }
 
@@ -288,10 +294,9 @@ table.data tr.hit td:first-child {
   overflow-x: auto;
 }
 
-/* Signal animation: a dash that travels once per step. Disabled at high speed and for reduced motion. */
 @keyframes flash {
   from {
-    background-color: var(--changed-soft);
+    background-color: var(--highlight);
   }
 }
 .flash {
@@ -306,7 +311,7 @@ table.data tr.hit td:first-child {
   }
 }
 .wire-active {
-  stroke: var(--active);
+  stroke: var(--signal);
 }
 .wire-travel {
   stroke-dasharray: 6 3;

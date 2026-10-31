@@ -72,7 +72,7 @@ export function AssemblerPanel() {
   return (
     <section className="panel" aria-label="Assembler" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div className="panel-head" style={{ marginBottom: 0 }}>
-        <span className="cap">Assembler · two passes</span>
+        <span className="cap">Two-pass assembler</span>
         <span style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <Ref title="Ch. 6: Programming the Basic Computer; Sec. 6-3: Assembler">Ch. 6</Ref>
           <button className="btn small" onClick={() => setOpen(false)}>
@@ -203,7 +203,7 @@ export function AssemblerPanel() {
             </div>
           </div>
           <div>
-            <span className="cap">Symbol table · start {toHex(result.start, 12)}</span>
+            <span className="cap">Symbol table, start {toHex(result.start, 12)}</span>
             <div className="mono" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 16px', marginTop: 6, fontSize: 13 }}>
               {[...result.symbols].map(([s, a]) => (
                 <span key={s}>

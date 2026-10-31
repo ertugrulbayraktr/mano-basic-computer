@@ -51,7 +51,7 @@ export function AluCircuit({ data, step }: { data: AluData; step: number }) {
       ].map(([y, label]) => (
         <g key={y as number}>
           <Wire points={[[20, y as number], [W - 30, y as number]]} on kind="signal" />
-          <Text at={[20, (y as number) - 9]} size={10} mono tone="active" weight={600}>
+          <Text at={[20, (y as number) - 9]} size={11.5} mono tone="active" weight={600}>
             {label}
           </Text>
         </g>
@@ -63,18 +63,18 @@ export function AluCircuit({ data, step }: { data: AluData; step: number }) {
 
       {/* Carry into stage 0 */}
       <V points={[[x0(0) + FA.dx + FA.w + 50, FA.y + 70], [x0(0) + FA.dx + FA.w, FA.y + 70]]} value={data.cin} settled />
-      <Text at={[x0(0) + FA.dx + FA.w + 54, FA.y + 70]} size={11} mono tone={data.cin ? 'active' : 'muted'} weight={600}>
+      <Text at={[x0(0) + FA.dx + FA.w + 54, FA.y + 70]} size={12.5} mono tone={data.cin ? 'active' : 'muted'} weight={600}>
         Cin = C0 = {data.cin}
       </Text>
       {/* Output carry */}
       <V points={[[x0(n - 1) + FA.dx + 10, FA.y + FA.h], [x0(n - 1) + FA.dx + 10, 226], [24, 226], [24, 790]]} value={data.stages[n - 1].cout} settled={faDone(n - 1)} />
-      <Text at={[30, 236]} size={10} mono tone="muted">
+      <Text at={[30, 236]} size={11.5} mono tone="muted">
         C{n}
       </Text>
 
       {/* Output word and status bits */}
-      <Text at={[LEFT, 768]} size={11} weight={600} tone="muted">
-        OUTPUT
+      <Text at={[LEFT, 768]} size={12.5} weight={600} tone="muted">
+        Output
       </Text>
       <Text at={[LEFT + 70, 768]} size={18} mono tone={outOn ? 'active' : 'muted'} weight={600}>
         F = {outOn ? data.stages.map((s) => s.f).reverse().join('') : '·'.repeat(n)}
@@ -92,7 +92,7 @@ export function AluCircuit({ data, step }: { data: AluData; step: number }) {
               <Text at={[LEFT + 20 + j * 250, 816]} size={15} mono weight={600} tone={statusOn && !meaningless ? (v ? 'changed' : 'text') : 'muted'}>
                 {k} = {statusOn ? v : '·'}
               </Text>
-              <Text at={[LEFT + 90 + j * 250, 816]} size={10.5} mono tone="muted">
+              <Text at={[LEFT + 90 + j * 250, 816]} size={12} mono tone="muted">
                 {f as string}
                 {meaningless && statusOn ? ' (meaningless)' : ''}
               </Text>
@@ -144,8 +144,8 @@ function Stage({
       <Text at={[x + 130, 22]} size={12} weight={600} anchor="middle">
         Stage {i}
       </Text>
-      <Text at={[x + 130, 40]} size={11} mono anchor="middle" tone="muted">
-        A{i} = {s.a} · B{i} = {s.b}
+      <Text at={[x + 130, 40]} size={12.5} mono anchor="middle" tone="muted">
+        A{i} = {s.a}, B{i} = {s.b}
       </Text>
       <rect x={x - 6} y={52} width={COL - 24} height={680} rx={10} fill="none" stroke="var(--line-soft)" strokeDasharray="4 4" />
 
@@ -154,14 +154,14 @@ function Stage({
       {s.yInputs.map((yi, k) => (
         <g key={k}>
           <V points={[[ym.x - 14, muxInputY(ym.y, ym.h, 4, k)], [ym.x, muxInputY(ym.y, ym.h, 4, k)]]} value={yi.value} settled kind="signal" />
-          <Text at={[ym.x - 16, muxInputY(ym.y, ym.h, 4, k)]} size={9.5} mono anchor="end" tone={yOn && k === s1s0 ? 'active' : 'muted'} weight={yOn && k === s1s0 ? 600 : 400}>
+          <Text at={[ym.x - 16, muxInputY(ym.y, ym.h, 4, k)]} size={12.5} mono anchor="end" tone={yOn && k === s1s0 ? 'active' : 'muted'} weight={yOn && k === s1s0 ? 600 : 400}>
             {yLabels[k]}={yi.value}
           </Text>
         </g>
       ))}
       <Mux x={ym.x} y={ym.y} w={ym.w} h={ym.h} inputs={yLabels} selected={s1s0} on={yOn} title={`Y${i} multiplexer`} />
       <V points={[[ym.x + ym.w, yOutY], [fa.x, yOutY]]} value={s.y} settled={yOn} />
-      <Text at={[ym.x + ym.w + 6, yOutY - 9]} size={9.5} mono tone={yOn ? 'active' : 'muted'}>
+      <Text at={[ym.x + ym.w + 6, yOutY - 9]} size={12.5} mono tone={yOn ? 'active' : 'muted'}>
         Y{i}={bit(s.y, yOn)}
       </Text>
 
@@ -170,11 +170,11 @@ function Stage({
         <Text at={[fa.x + fa.w / 2, fa.y + 34]} size={13} anchor="middle" weight={600}>
           FA
         </Text>
-        <Text at={[fa.x + fa.w / 2, fa.y + 54]} size={10} anchor="middle" mono tone="muted">
+        <Text at={[fa.x + fa.w / 2, fa.y + 54]} size={11.5} anchor="middle" mono tone="muted">
           {s.a}+{bit(s.y, yOn)}+{bit(s.cin, cinSettled)}
         </Text>
       </Block>
-      <Text at={[fa.x + fa.w + 4, fa.y + 62]} size={9.5} mono tone={cinSettled && s.cin ? 'active' : 'muted'}>
+      <Text at={[fa.x + fa.w + 4, fa.y + 62]} size={12.5} mono tone={cinSettled && s.cin ? 'active' : 'muted'}>
         C{i}
       </Text>
       {/* Carry out to the next stage on the left */}
@@ -182,13 +182,13 @@ function Stage({
         <V points={[[fa.x + 10, fa.y + fa.h], [fa.x + 10, 226], [x - 80, 226], [x - 80, fa.y + 70], [x - COL + FA.dx + FA.w, fa.y + 70]]} value={s.cout} settled={done} />
       )}
       {i < n - 1 && (
-        <Text at={[fa.x - 4, 236]} size={9.5} mono anchor="end" tone={done && s.cout ? 'active' : 'muted'}>
+        <Text at={[fa.x - 4, 236]} size={12.5} mono anchor="end" tone={done && s.cout ? 'active' : 'muted'}>
           C{i + 1}={bit(s.cout, done)}
         </Text>
       )}
       {/* Sum D to the output multiplexer */}
       <V points={[[fa.x + 58, fa.y + fa.h], [fa.x + 58, oIn(0)], [om.x, oIn(0)]]} value={s.d} settled={done} />
-      <Text at={[fa.x + 62, fa.y + fa.h + 14]} size={9.5} mono tone={done ? 'active' : 'muted'}>
+      <Text at={[fa.x + 62, fa.y + fa.h + 14]} size={12.5} mono tone={done ? 'active' : 'muted'}>
         D{i}={bit(s.d, done)}
       </Text>
 
@@ -201,7 +201,7 @@ function Stage({
             <g transform={`translate(${x + 30}, ${gy - 14.4}) scale(0.45)`} opacity={logicOn ? 1 : 0.55}>
               <GateSymbol name={g} x={s.a} y={s.b} out={gateVals[k]} label={`${g} gate of stage ${i}`} />
             </g>
-            <Text at={[x + 26, gy]} size={8.5} mono anchor="end" tone="muted">
+            <Text at={[x + 26, gy]} size={11.5} mono anchor="end" tone="muted">
               {g === 'NOT' ? 'A' : 'A,B'}
             </Text>
             <V points={[[x + 84, gy], [lm.x, muxInputY(lm.y, lm.h, 4, k)]]} value={gateVals[k]} settled={logicOn} kind="signal" />
@@ -210,18 +210,18 @@ function Stage({
       })}
       <Mux x={lm.x} y={lm.y} w={lm.w} h={lm.h} inputs={['AND', 'OR', 'XOR', 'NOT']} selected={s1s0} on={logicOn} title={`Logic multiplexer of stage ${i}`} />
       <V points={[[lm.x + lm.w, lm.y + lm.h / 2], [x + 186, lm.y + lm.h / 2], [x + 186, oIn(1)], [om.x, oIn(1)]]} value={s.e} settled={logicOn} />
-      <Text at={[lm.x + lm.w + 4, lm.y + lm.h / 2 - 9]} size={9.5} mono tone={logicOn ? 'active' : 'muted'}>
+      <Text at={[lm.x + lm.w + 4, lm.y + lm.h / 2 - 9]} size={12.5} mono tone={logicOn ? 'active' : 'muted'}>
         E{i}={bit(s.e, logicOn)}
       </Text>
 
       {/* Output multiplexer: D, E, shr (A_{i+1}), shl (A_{i-1}) */}
       <Wire points={[[om.x + om.w / 2, OSEL_Y], [om.x + om.w / 2, om.y + 4]]} on kind="signal" />
       <V points={[[om.x - 16, oIn(2)], [om.x, oIn(2)]]} value={s.shr} settled kind="signal" />
-      <Text at={[om.x - 18, oIn(2)]} size={9} mono anchor="end" tone={outOn && s3s2 === 2 ? 'active' : 'muted'}>
+      <Text at={[om.x - 18, oIn(2)]} size={12} mono anchor="end" tone={outOn && s3s2 === 2 ? 'active' : 'muted'}>
         {i === n - 1 ? '0' : `A${i + 1}`}={s.shr}
       </Text>
       <V points={[[om.x - 16, oIn(3)], [om.x, oIn(3)]]} value={s.shl} settled kind="signal" />
-      <Text at={[om.x - 18, oIn(3)]} size={9} mono anchor="end" tone={outOn && s3s2 === 3 ? 'active' : 'muted'}>
+      <Text at={[om.x - 18, oIn(3)]} size={12} mono anchor="end" tone={outOn && s3s2 === 3 ? 'active' : 'muted'}>
         {i === 0 ? '0' : `A${i - 1}`}={s.shl}
       </Text>
       <Mux x={om.x} y={om.y} w={om.w} h={om.h} inputs={['D', 'E', 'shr', 'shl']} selected={s3s2} on={outOn} title={`Output multiplexer of stage ${i}`} />

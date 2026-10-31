@@ -1,106 +1,127 @@
 .shell {
-  max-width: 1480px;
+  max-width: 1720px;
   margin: 0 auto;
-  padding: 18px 24px 32px;
+  padding: 0 24px 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .topbar {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 28px;
-  border-bottom: 1px solid var(--line-soft);
-  padding-bottom: 12px;
+  align-items: stretch;
+  gap: 4px 28px;
+  border-bottom: 1px solid var(--rule);
+  min-height: 52px;
 }
 
 .brand {
   display: flex;
   align-items: baseline;
+  align-self: center;
   gap: 10px;
   text-decoration: none;
-  color: var(--text);
+  color: var(--ink);
 }
 .brand-name {
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: -0.01em;
+}
+.brand-sub {
+  font-size: 13px;
+  color: var(--muted);
 }
 
 .rooms {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  align-items: stretch;
+  gap: 0 20px;
   flex: 1 1 auto;
 }
 .room-link {
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  color: var(--muted);
-  padding: 7px 12px;
-  border-radius: 6px;
+  color: var(--ink-2);
   font-weight: 500;
+  font-size: 14.5px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding-top: 2px;
 }
 .room-link:hover {
-  color: var(--text);
-  background: var(--surface);
+  color: var(--ink);
 }
 .room-link.active {
-  color: var(--active);
+  color: var(--ink);
   font-weight: 600;
-  background: var(--active-soft);
+  border-bottom-color: var(--ink);
 }
-.room-no {
-  font-size: 12px;
+.room-link.secondary {
+  font-size: 13.5px;
+  color: var(--muted);
 }
-.room-link.active .room-no {
-  color: var(--active);
+.nav-sep {
+  width: 1px;
+  background: var(--rule);
+  margin: 16px 2px;
+}
+.topbar > .base-switch {
+  align-self: center;
 }
 
 .footer {
   color: var(--muted);
-  font-size: 13px;
-  border-top: 1px solid var(--line-soft);
-  padding-top: 12px;
+  font-size: 12.5px;
+  border-top: 1px solid var(--rule);
+  padding-top: 10px;
 }
 
-/* Two-pane room layout: section menu + content. */
+/* Section menu + content, used by the secondary pages. */
 .room {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 24px;
   align-items: flex-start;
+  padding-top: 8px;
 }
 .room-menu {
-  flex: 1 1 220px;
-  max-width: 260px;
-  padding: 8px;
+  flex: 1 1 200px;
+  max-width: 230px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  border: 0;
+  padding: 0;
+  position: sticky;
+  top: 12px;
 }
 .room-menu a {
   display: flex;
   justify-content: space-between;
   gap: 8px;
   text-decoration: none;
-  color: var(--text-2);
-  padding: 9px 12px;
-  border-radius: 4px;
-  font-size: 15px;
+  color: var(--ink-2);
+  padding: 6px 0 6px 12px;
+  font-size: 14px;
+  border-left: 2px solid var(--rule);
 }
 .room-menu a > span:last-child {
   white-space: nowrap;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-family: var(--sans) !important;
   padding-top: 2px;
 }
 .room-menu a:hover {
-  color: var(--text);
+  color: var(--ink);
 }
 .room-menu a.active {
-  background: var(--active-soft);
-  color: var(--text);
-  box-shadow: inset 2px 0 0 var(--active);
+  color: var(--ink);
+  font-weight: 600;
+  border-left-color: var(--ink);
 }
 .room-content {
   flex: 999 1 640px;
@@ -113,14 +134,15 @@
   margin: 0;
   font-size: 26px;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 .block-lede {
-  margin: 4px 0 0;
-  color: var(--text-2);
+  margin: 6px 0 0;
+  color: var(--ink-2);
   font-size: 15px;
-  max-width: 820px;
-  line-height: 1.5;
+  max-width: 72ch;
+  line-height: 1.55;
 }
 .row {
   display: flex;
@@ -140,11 +162,15 @@
 .muted {
   color: var(--muted);
 }
-.nav-sep {
-  width: 1px;
-  background: var(--line);
-  margin: 6px 8px;
+
+/* Secondary pages read as one sheet: sections separated by rules, not boxed. */
+.room-content > .panel {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  border-radius: 0;
+  padding: 18px 0 4px;
 }
-.room-link.secondary {
-  font-size: 13px;
+.room-content > .panel:first-child {
+  border-top: 0;
+  padding-top: 0;
 }

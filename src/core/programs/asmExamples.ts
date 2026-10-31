@@ -15,7 +15,7 @@ export interface AsmExample {
 export const ASM_EXAMPLES: AsmExample[] = [
   {
     id: 'asm-add',
-    title: '7 · Add two numbers',
+    title: '7. Add two numbers',
     reference: 'Sec. 6-2',
     source: `        ORG 100
         LDA A       / load first operand into AC
@@ -31,7 +31,7 @@ C,      DEC 0       / the sum goes here
   },
   {
     id: 'asm-sub',
-    title: '8 · Subtract two numbers',
+    title: '8. Subtract two numbers',
     reference: 'Sec. 6-4',
     source: `        ORG 100
         LDA SUB     / load the subtrahend
@@ -49,7 +49,7 @@ DIF,    HEX 0       / the difference goes here
   },
   {
     id: 'asm-or',
-    title: '9 · OR with De Morgan',
+    title: '9. OR with De Morgan',
     reference: 'Sec. 6-4',
     source: `/ The Basic Computer has AND but no OR.
 / De Morgan: A OR B = (A' AND B')'
@@ -73,7 +73,7 @@ C,      HEX 0
   },
   {
     id: 'asm-io',
-    title: '10 · Echo input to output',
+    title: '10. Echo input to output',
     reference: 'Sec. 6-8',
     source: `/ Program-controlled I/O: wait for a key,
 / then wait for the printer and print it.
@@ -91,7 +91,7 @@ COF,    SKO         / is the printer ready (FGO = 1)?
   },
   {
     id: 'asm-interrupt',
-    title: '11 · Interrupt-driven input',
+    title: '11. Interrupt-driven input',
     reference: 'Fig. 5-13, Sec. 6-8',
     source: `/ The main program counts in AC forever.
 / A key press interrupts it; the service routine

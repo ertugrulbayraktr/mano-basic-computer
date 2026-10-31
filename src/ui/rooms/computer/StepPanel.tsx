@@ -15,11 +15,11 @@ export function StepPanel({ view }: { view: PulseView | null }) {
     const next = controlSignals(sim.state);
     return (
       <section className="panel step-panel" aria-label="Current pulse">
-        <span className="cap">Ready</span>
-        <p style={{ margin: '8px 0' }}>
-          Choose an example, then press <b>Step</b>. Each clock pulse is shown in four sub-steps: timing and decode, control gates, data flow and the clock edge.
+        <h2 className="step-title">Ready for the first clock pulse</h2>
+        <p style={{ margin: '4px 0 10px', color: 'var(--ink-2)', maxWidth: '44ch' }}>
+          Pick an example and press Step. Each pulse plays in four parts: the decoders, the control gates, the data on the bus and the clock edge.
         </p>
-        <span className="cap">First pulse</span>
+        <span className="cap">The first pulse will do</span>
         {next.lines.map((l) => (
           <div key={l.id} className="mono rtl-sm">
             <span className="cf">{l.control}:</span> {l.statement}
@@ -34,13 +34,15 @@ export function StepPanel({ view }: { view: PulseView | null }) {
   const halted = t.signals.phase === 'halted';
   return (
     <section className="panel step-panel" aria-label="Current pulse">
-      <div className="panel-head" style={{ marginBottom: 6 }}>
-        <span className="cap">
-          Pulse {sim.pulses} · T{view.T}
-          {mnemonic && t.signals.phase !== 'interrupt' ? ` · ${mnemonic}` : t.signals.phase === 'interrupt' ? ' · interrupt cycle' : ''}
-        </span>
+      <div className="panel-head" style={{ marginBottom: 2 }}>
+        <h2 className="step-title">
+          Pulse {sim.pulses}, T{view.T}
+        </h2>
         <Ref>Table 5-6</Ref>
       </div>
+      <span className="step-meta">
+        {t.signals.phase === 'interrupt' ? 'Interrupt cycle' : mnemonic ? `Instruction ${mnemonic}` : ''}
+      </span>
       {t.signals.lines.map((l) => (
         <div key={l.id} className="mono rtl-sm">
           <span className="cf">{l.control}:</span> {l.statement}

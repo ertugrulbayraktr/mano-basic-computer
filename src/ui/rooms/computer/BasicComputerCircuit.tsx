@@ -115,49 +115,46 @@ export function BasicComputerCircuit({
   return (
     <CircuitCanvas width={W} height={H} label="Basic Computer circuit: control unit, bus and registers">
       {/* ---------------- Control unit ---------------- */}
-      <Text at={[30, 14]} size={11} weight={600} tone="muted">
-        CONTROL UNIT · Fig. 5-6
+      <Text at={[30, 14]} size={12.5} weight={600} tone="muted">
+        Control unit (Fig. 5-6)
       </Text>
 
       {/* IR as seen by the control unit. */}
       <Block x={IRV.x} y={IRV.y} w={IRV.w} h={IRV.h} dashed title="Instruction register (the same IR as on the bus)">
-        <Text at={[IRV.x + 10, IRV.y + 16]} size={11} tone="muted">
+        <Text at={[IRV.x + 10, IRV.y + 16]} size={12.5} tone="muted">
           IR
         </Text>
         <Text at={[IRV.x + 10, IRV.y + 34]} size={14} mono>
           {toBin(shown.reg.IR >> 15, 1)} {toBin((shown.reg.IR >> 12) & 7, 3)} {fmt(shown.reg.IR & 0xfff, 12, 'hex')}
         </Text>
-        <Text at={[IRV.x + IRV.w - 8, IRV.y + 16]} size={9} anchor="end" tone="muted" mono>
-          15 14-12 11-0
-        </Text>
       </Block>
       {/* IR(12-14) → 3×8 decoder, IR(15) → I, IR(0-11) → control logic as B0…B11 */}
       <Wire points={[[IRV.x + IRV.w, IRV.y + 24], [200, IRV.y + 24], [200, DEC3.y + DEC3.h / 2], [DEC3.x, DEC3.y + DEC3.h / 2]]} on={live} kind="data" />
-      <Text at={[188, IRV.y + 14]} size={9} mono tone="muted" anchor="end">
+      <Text at={[188, IRV.y + 14]} size={12} mono tone="muted" anchor="end">
         12-14
       </Text>
       <Wire points={[[IRV.x + 40, IRV.y + IRV.h], [IRV.x + 40, IFF.y + IFF.h / 2], [IFF.x, IFF.y + IFF.h / 2]]} on={live} />
-      <Text at={[IRV.x + 46, IRV.y + IRV.h + 12]} size={9} mono tone="muted">
+      <Text at={[IRV.x + 46, IRV.y + IRV.h + 12]} size={12} mono tone="muted">
         15
       </Text>
       <Wire points={[[IRV.x + 110, IRV.y], [IRV.x + 110, 10], [345, 10], [345, 40], [CL.x, 40]]} on={live && T === 3 && D === 7} kind="data" />
-      <Text at={[200, 4]} size={9} mono tone="muted">
+      <Text at={[200, 4]} size={12} mono tone="muted">
         IR(0-11) = B0…B11
       </Text>
 
       {/* 3 × 8 operation decoder */}
       <Block x={DEC3.x} y={DEC3.y} w={DEC3.w} h={DEC3.h} on={live}>
-        <Text at={[DEC3.x + DEC3.w / 2, DEC3.y + DEC3.h / 2 - 8]} size={10} anchor="middle" tone="muted">
+        <Text at={[DEC3.x + DEC3.w / 2, DEC3.y + DEC3.h / 2 - 8]} size={11.5} anchor="middle" tone="muted">
           3 × 8
         </Text>
-        <Text at={[DEC3.x + DEC3.w / 2, DEC3.y + DEC3.h / 2 + 6]} size={10} anchor="middle" tone="muted">
+        <Text at={[DEC3.x + DEC3.w / 2, DEC3.y + DEC3.h / 2 + 6]} size={11.5} anchor="middle" tone="muted">
           decoder
         </Text>
       </Block>
       {Array.from({ length: 8 }, (_, i) => (
         <g key={i}>
           <Wire points={[[DEC3.x + DEC3.w, dLineY(i)], [CL.x, dLineY(i)]]} on={D === i} />
-          <Text at={[DEC3.x + DEC3.w + 6, dLineY(i) - 6]} size={9.5} mono tone={D === i ? 'active' : 'muted'} weight={D === i ? 600 : 400}>
+          <Text at={[DEC3.x + DEC3.w + 6, dLineY(i) - 6]} size={12.5} mono tone={D === i ? 'active' : 'muted'} weight={D === i ? 600 : 400}>
             D{i}
           </Text>
         </g>
@@ -176,13 +173,13 @@ export function BasicComputerCircuit({
 
       {/* Sequence counter */}
       <Block x={SCB.x} y={SCB.y} w={SCB.w} h={SCB.h} on={live} changed={changed('SC')} title="Sequence counter SC (4 bits)">
-        <Text at={[SCB.x + 10, SCB.y + 18]} size={11} tone="muted">
+        <Text at={[SCB.x + 10, SCB.y + 18]} size={12.5} tone="muted">
           SC
         </Text>
         <Text at={[SCB.x + 10, SCB.y + 38]} size={16} mono tone={changed('SC') ? 'changed' : 'text'}>
           {toBin(shown.SC, 4)}
         </Text>
-        <Text at={[SCB.x + SCB.w - 10, SCB.y + 38]} size={11} mono anchor="end" tone="muted">
+        <Text at={[SCB.x + SCB.w - 10, SCB.y + 38]} size={12.5} mono anchor="end" tone="muted">
           = {shown.SC}
         </Text>
       </Block>
@@ -192,17 +189,17 @@ export function BasicComputerCircuit({
 
       {/* 4 × 16 timing decoder */}
       <Block x={DEC4.x} y={DEC4.y} w={DEC4.w} h={DEC4.h} on={live}>
-        <Text at={[DEC4.x + DEC4.w / 2, DEC4.y + DEC4.h / 2 - 8]} size={10} anchor="middle" tone="muted">
+        <Text at={[DEC4.x + DEC4.w / 2, DEC4.y + DEC4.h / 2 - 8]} size={11.5} anchor="middle" tone="muted">
           4 × 16
         </Text>
-        <Text at={[DEC4.x + DEC4.w / 2, DEC4.y + DEC4.h / 2 + 6]} size={10} anchor="middle" tone="muted">
+        <Text at={[DEC4.x + DEC4.w / 2, DEC4.y + DEC4.h / 2 + 6]} size={11.5} anchor="middle" tone="muted">
           decoder
         </Text>
       </Block>
       {Array.from({ length: 16 }, (_, i) => (
         <g key={i}>
           <Wire points={[[DEC4.x + DEC4.w, tLineY(i)], [CL.x, tLineY(i)]]} on={T === i} />
-          <Text at={[DEC4.x + DEC4.w + 6, tLineY(i) - 6]} size={9.5} mono tone={T === i ? 'active' : 'muted'} weight={T === i ? 600 : 400}>
+          <Text at={[DEC4.x + DEC4.w + 6, tLineY(i) - 6]} size={12.5} mono tone={T === i ? 'active' : 'muted'} weight={T === i ? 600 : 400}>
             T{i}
           </Text>
         </g>
@@ -214,7 +211,7 @@ export function BasicComputerCircuit({
         return (
           <g key={f}>
             <Block x={DEC4.x - 10} y={ffY(i)} w={70} h={30} on={on} changed={changed(f)}>
-              <Text at={[DEC4.x, ffY(i) + 15]} size={11} weight={600}>
+              <Text at={[DEC4.x, ffY(i) + 15]} size={12.5} weight={600}>
                 {f}
               </Text>
               <Text at={[DEC4.x + 50, ffY(i) + 15]} size={13} mono anchor="end" tone={changed(f) ? 'changed' : 'text'}>
@@ -231,10 +228,10 @@ export function BasicComputerCircuit({
 
       {/* ---------------- Bus select encoder (Table 5-7) ---------------- */}
       <Block x={ENC.x} y={ENC.y} w={ENC.w} h={ENC.h} on={s2 && busOn} title="Bus select encoder (Table 5-7)">
-        <Text at={[ENC.x + ENC.w / 2, ENC.y + ENC.h / 2 - 8]} size={10} anchor="middle" tone="muted">
+        <Text at={[ENC.x + ENC.w / 2, ENC.y + ENC.h / 2 - 8]} size={11.5} anchor="middle" tone="muted">
           encoder
         </Text>
-        <Text at={[ENC.x + ENC.w / 2, ENC.y + ENC.h / 2 + 6]} size={10} anchor="middle" tone="muted">
+        <Text at={[ENC.x + ENC.w / 2, ENC.y + ENC.h / 2 + 6]} size={11.5} anchor="middle" tone="muted">
           Table 5-7
         </Text>
       </Block>
@@ -243,23 +240,23 @@ export function BasicComputerCircuit({
         return (
           <g key={i}>
             <Wire points={[[CL.x + CL.w, xInY(i)], [ENC.x, xInY(i)]]} on={on} />
-            <Text at={[ENC.x - 6, xInY(i) - 6]} size={9.5} mono anchor="end" tone={on ? 'active' : 'muted'} weight={on ? 600 : 400}>
+            <Text at={[ENC.x - 6, xInY(i) - 6]} size={12.5} mono anchor="end" tone={on ? 'active' : 'muted'} weight={on ? 600 : 400}>
               x{i}
             </Text>
           </g>
         );
       })}
       <Wire points={[[ENC.x + ENC.w / 2, ENC.y + ENC.h], [ENC.x + ENC.w / 2, BUS_TOP - 10], [BUS_X - 30, BUS_TOP - 10]]} on={busOn} kind="data" arrow />
-      <Text at={[ENC.x + ENC.w / 2 + 8, ENC.y + ENC.h + 14]} size={10} mono tone={busOn ? 'active' : 'muted'} weight={busOn ? 600 : 400}>
+      <Text at={[ENC.x + ENC.w / 2 + 8, ENC.y + ENC.h + 14]} size={11.5} mono tone={busOn ? 'active' : 'muted'} weight={busOn ? 600 : 400}>
         S2S1S0 = {toBin(s2 ? (c?.busSelect ?? 0) : 0, 3)}
       </Text>
 
       {/* ---------------- Common bus (Fig. 5-4) ---------------- */}
-      <Text at={[BUS_X - 28, BUS_TOP - 30]} size={11} weight={600} tone="muted">
-        COMMON BUS · Fig. 5-4
+      <Text at={[BUS_X - 28, BUS_TOP - 30]} size={12.5} weight={600} tone="muted">
+        Common bus (Fig. 5-4)
       </Text>
       <Block x={BUS_X - 30} y={BUS_TOP - 22} w={60} h={24} on={busOn} title="Bus multiplexer: S2S1S0 selects the source">
-        <Text at={[BUS_X, BUS_TOP - 10]} size={10} anchor="middle" mono tone={busOn ? 'active' : 'muted'}>
+        <Text at={[BUS_X, BUS_TOP - 10]} size={11.5} anchor="middle" mono tone={busOn ? 'active' : 'muted'}>
           select
         </Text>
       </Block>
@@ -299,7 +296,7 @@ export function BasicComputerCircuit({
             {r.sel !== undefined && (
               <>
                 <Wire points={[[RX, outY], [BUS_X + 4, outY]]} on={src} kind="data" arrow travel />
-                <Text at={[BUS_X + 16, outY - 8]} size={9.5} mono tone={src ? 'active' : 'muted'} weight={src ? 600 : 400}>
+                <Text at={[BUS_X + 16, outY - 8]} size={12.5} mono tone={src ? 'active' : 'muted'} weight={src ? 600 : 400}>
                   {r.sel}
                 </Text>
               </>
@@ -309,12 +306,12 @@ export function BasicComputerCircuit({
                 {name === 'Memory' ? 'Memory 4096 × 16' : name}
               </Text>
               {name === 'Memory' && (
-                <Text at={[RX + 12, r.y + r.h / 2 + 12]} size={10} mono tone="muted">
+                <Text at={[RX + 12, r.y + r.h / 2 + 12]} size={11.5} mono tone="muted">
                   M[AR] = M[{fmt(shown.reg.AR, 12, 'hex')}]
                 </Text>
               )}
               {ch && oldValue(name) !== undefined && (
-                <Text at={[RX + RW - 12, r.y + 14]} size={10} mono anchor="end" tone="muted">
+                <Text at={[RX + RW - 12, r.y + 14]} size={11.5} mono anchor="end" tone="muted">
                   was {v(oldValue(name)!, width)}
                 </Text>
               )}
@@ -336,7 +333,7 @@ export function BasicComputerCircuit({
         kind="data"
         arrow
       />
-      <Text at={[RX + RW + 30, 342]} size={9.5} tone="muted">
+      <Text at={[RX + RW + 30, 342]} size={12.5} tone="muted">
         address
       </Text>
 
@@ -345,17 +342,17 @@ export function BasicComputerCircuit({
         <Text at={[ADDER.x + 12, ADDER.y + ADDER.h / 2]} size={12} weight={600}>
           Adder &amp; logic
         </Text>
-        <Text at={[ADDER.x + ADDER.w - 12, ADDER.y + ADDER.h / 2]} size={10} anchor="end" tone="active">
-          Fig. 5-21 ›
+        <Text at={[ADDER.x + ADDER.w - 12, ADDER.y + ADDER.h / 2]} size={11.5} anchor="end" tone="active">
+          Open Fig. 5-21
         </Text>
         {s2 && t?.acPaths.length ? (
-          <Text at={[ADDER.x + 120, ADDER.y + ADDER.h / 2]} size={11} mono tone="active">
+          <Text at={[ADDER.x + 120, ADDER.y + ADDER.h / 2]} size={12.5} mono tone="active">
             {t.acPaths.map((p) => p.op).join(' + ')}
           </Text>
         ) : null}
       </Block>
       <Wire points={[[RX + 200, 596], [RX + 200, ADDER.y]]} on={s2 && !!t?.acPaths.some((p) => ['AND', 'ADD', 'DR'].includes(p.op))} kind="data" arrow />
-      <Text at={[RX + 206, 614]} size={9.5} tone="muted">
+      <Text at={[RX + 206, 614]} size={12.5} tone="muted">
         DR
       </Text>
       <Wire points={[[RX + 150, ADDER.y + ADDER.h], [RX + 150, 714]]} on={s2 && !!t?.acPaths.length} kind="data" arrow />
@@ -382,7 +379,7 @@ export function BasicComputerCircuit({
       {s3 && (
         <g>
           <rect x={RX + RW + 50} y={940} width={120} height={28} rx={6} fill="var(--changed-soft)" stroke="var(--changed)" />
-          <Text at={[RX + RW + 110, 954]} size={11} anchor="middle" tone="changed" weight={600}>
+          <Text at={[RX + RW + 110, 954]} size={12.5} anchor="middle" tone="changed" weight={600}>
             ⎍ clock edge
           </Text>
         </g>
@@ -430,11 +427,11 @@ function ControlGates({ view, sub, live, onOpen }: { view: PulseView | null; sub
   return (
     <g>
       <Block x={CL.x} y={CL.y} w={CL.w} h={CL.h} dashed onClick={onOpen} title="Control logic gates, click to see every equation">
-        <Text at={[CL.x + 14, CL.y + 20]} size={11} weight={600} tone="muted">
-          CONTROL LOGIC GATES
+        <Text at={[CL.x + 14, CL.y + 20]} size={12.5} weight={600} tone="muted">
+          Control logic gates
         </Text>
-        <Text at={[CL.x + 14, CL.y + 36]} size={10} tone="muted">
-          Sec. 5-10 · click for all equations
+        <Text at={[CL.x + 14, CL.y + 36]} size={11.5} tone="muted">
+          Sec. 5-10. Click for every equation.
         </Text>
       </Block>
 
@@ -444,7 +441,7 @@ function ControlGates({ view, sub, live, onOpen }: { view: PulseView | null; sub
         return (
           <g key={e.id}>
             <Wire points={[[pinX, pinY(e.id)], [CL.x + CL.w, pinY(e.id)]]} on={on} />
-            <Text at={[CL.x + CL.w - 6, pinY(e.id) - 6]} size={9} mono anchor="end" tone={on ? 'active' : 'muted'} weight={on ? 600 : 400}>
+            <Text at={[CL.x + CL.w - 6, pinY(e.id) - 6]} size={12} mono anchor="end" tone={on ? 'active' : 'muted'} weight={on ? 600 : 400}>
               {e.name}
             </Text>
           </g>
@@ -452,7 +449,7 @@ function ControlGates({ view, sub, live, onOpen }: { view: PulseView | null; sub
       })}
 
       {placed.length === 0 && (
-        <Text at={[CL.x + 14, CL.y + 70]} size={11} tone="muted">
+        <Text at={[CL.x + 14, CL.y + 70]} size={12.5} tone="muted">
           {live ? 'No gate outputs 1 in this pulse.' : 'Step a pulse to see the gates.'}
         </Text>
       )}
@@ -477,14 +474,14 @@ function ControlGates({ view, sub, live, onOpen }: { view: PulseView | null; sub
                     <Wire points={[[gx - 30, inY], [gx - (neg ? 6 : 0), inY]]} on={on} />
                   )}
                   {neg && <circle cx={gx - 3} cy={inY} r={3} fill="var(--surface)" stroke={on ? 'var(--active)' : 'var(--wire)'} strokeWidth={1.2} />}
-                  <Text at={[gx - 8, inY - 4]} size={8} mono anchor="end" tone={on ? 'active' : 'muted'}>
+                  <Text at={[gx - 8, inY - 4]} size={12.5} mono anchor="end" tone={on ? 'active' : 'muted'}>
                     {litName.replace('AC15', 'AC(15)').replace('ACZ', 'AC=0').replace('DRZ', 'DR=0')}
                   </Text>
                 </g>
               );
             })}
             <Gate type="AND" x={gx} y={r.y} w={30} h={r.h} on={lit} />
-            <Text at={[gx + 15, r.y - 6]} size={9.5} mono anchor="middle" tone={lit ? 'active' : 'muted'} weight={600}>
+            <Text at={[gx + 15, r.y - 6]} size={12.5} mono anchor="middle" tone={lit ? 'active' : 'muted'} weight={600}>
               {r.label}
             </Text>
             {r.outputs.map((o) => (
