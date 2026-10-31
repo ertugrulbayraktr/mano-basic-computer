@@ -10,26 +10,40 @@ timing signals T0…T15, the control equations of Sec. 5-10, and figure and tabl
 Reading the drawings: a **green** wire carries 1 or an active control signal (the convention of
 logic simulators); a **yellow highlight** marks a value that changed on the clock edge.
 
-![The Basic Computer circuit during the data-flow sub-step of D1T4 (ADD 205)](docs/screenshots/basic-computer.jpg)
+![The Basic Computer workbench: circuit, inspector, and the timing diagram of ADD 205](docs/screenshots/basic-computer.jpg)
 
 ## Basic Computer (Ch. 5–6)
 
-One zoomable circuit: the control unit of Fig. 5-6 (IR, the 3 × 8 and 4 × 16 decoders, SC,
-flip-flops and the control logic gates), the bus select encoder of Table 5-7, the common bus
-and the registers of Fig. 5-4, the memory and the adder-and-logic circuit of Fig. 5-21.
+The page is a workbench, laid out like a logic analyzer:
+
+- **The circuit**, zoomable: the control unit of Fig. 5-6 (IR, the 3 × 8 and 4 × 16 decoders, SC,
+  flip-flops and the control logic gates), the bus select encoder of Table 5-7, the common bus and
+  the registers of Fig. 5-4, the memory and the adder-and-logic circuit of Fig. 5-21.
+- **The inspector**: the pulse being shown with its Table 5-6 line and a plain-language
+  explanation of each sub-step; registers, flip-flops and memory, all editable; the keyboard and
+  printer.
+- **The dock**: the clock controls and a **timing diagram** in the spirit of Fig. 5-7, with an
+  instruction band, the clock, T0…T6, SC, the bus value and any control signal you add. Click or
+  drag anywhere on it to move the machine to that moment, backwards or forwards.
 
 Every clock pulse is shown in **four sub-steps**, in the order the hardware settles:
 
 1. **Timing and decode**: SC drives the 4 × 16 decoder (T0…T15); IR(12-14) drives the 3 × 8 decoder (D0…D7).
 2. **Control gates**: the AND gates whose term is 1 (e.g. `D1T4`) light up, wired from the T and D lines to the control outputs they raise (`LD(DR)`, `Read`, `x7`).
-3. **Data flow**: the encoder sets S2S1S0, the source drives the bus, and the value travels to the inputs of the registers that will load it.
+3. **Data flow**: the encoder sets S2S1S0, the source drives the bus, and a pulse travels to the registers that will load it.
 4. **Clock edge**: every enabled register and flip-flop stores its new value at the same instant.
 
-A side panel explains each sub-step in plain language and shows the Table 5-6 line. Click the
-control logic for every equation of Sec. 5-10 with the active terms lit, or the adder-and-logic
-block for one stage of Fig. 5-21. You can also step back through the whole history, run at
-adjustable speed, edit memory, set breakpoints, type on the keyboard, read the printer, and write
-and assemble programs (Ch. 6).
+**Follow** turns the canvas into a camera that glides to wherever each sub-step happens, with a
+caption, so you ride along with the signal.
+
+![Follow: the camera on the D1T4 gate, with T4 and D1 feeding it](docs/screenshots/follow-camera.jpg)
+
+**X-ray**: hover a memory word and every part of the circuit its instruction will use, over all
+of its pulses, is outlined. **Usage**: shade every part by how often the program used it.
+
+Clicking the control logic lists every equation of Sec. 5-10 with the active terms lit; clicking
+the adder-and-logic block opens one stage of Fig. 5-21. Breakpoints, run speed, and a two-pass
+assembler (Ch. 6) for your own programs are there too.
 
 ## ALU (Fig. 4-13)
 
@@ -37,10 +51,12 @@ All four stages of the arithmetic logic shift unit, each with its Y multiplexer 
 its logic gates and multiplexer, and its output multiplexer; shared select lines; the carry chain.
 Choose A, B, S3S2S1S0 and Cin (or click a row of Table 4-8) and step through the propagation:
 Y multiplexers → full adder 0, 1, 2, 3 as the carry ripples → logic stage → output multiplexers → C, S, Z, V.
-Wires show their value once it has settled. Both encodings of the arithmetic rows are available
-(Table 4-8 as printed, or the Fig. 4-9 wiring of Table 4-4).
+Wires show their value once it has settled; the dock shows a propagation timeline of which bits
+of Y, the carries, D, E, F and the status bits have settled after each step, and Follow rides
+the carry from stage to stage. Both encodings of the arithmetic rows are available (Table 4-8 as
+printed, or the Fig. 4-9 wiring of Table 4-4).
 
-![The ALU circuit while the carry ripples into stage 2](docs/screenshots/alu-circuit.jpg)
+![The ALU while the carry ripples into stage 3](docs/screenshots/alu-circuit.jpg)
 
 ## More
 
@@ -88,11 +104,15 @@ src/core/            pure TypeScript, no React or DOM: fully unit-tested
   basic/             control unit (control.ts), one clock edge (pulse.ts),
                      controlLogic.ts: the control gate equations of Sec. 5-10,
                      microsteps.ts: a pulse split into its four sub-steps,
-                     Fig. 5-21 circuit, disassembler, explanations, Simulator
+                     activity.ts: circuit parts each pulse uses, x-ray, usage,
+                     waveforms.ts: timing-diagram lanes,
+                     Fig. 5-21 circuit, disassembler, explanations,
+                     Simulator (undo, redo, seek, timeline)
   assembler/         two-pass assembler (Ch. 6)
   programs/          example programs 1-11
 src/ui/
-  circuit/           SVG circuit toolkit: pan/zoom canvas, wires, gates, MUX, blocks, pins
+  circuit/           SVG circuit toolkit: pan/zoom canvas with follow camera, wires, gates, MUX
+  timeline/          timing diagram
   rooms/computer/    Basic Computer circuit page
   rooms/alu/         ALU circuit page and ALU lab sections
   rooms/blocks/      building blocks
