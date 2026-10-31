@@ -10,11 +10,13 @@ timing signals T0…T15, the control equations of Sec. 5-10, and figure and tabl
 Reading the drawings: a **green** wire carries 1 or an active control signal (the convention of
 logic simulators); a **yellow highlight** marks a value that changed on the clock edge.
 
-![The Basic Computer workbench: circuit, inspector, and the timing diagram of ADD 205](docs/screenshots/basic-computer.jpg)
+![Follow: the camera rides ADD 205 through fetch, decode and execute, sub-step by sub-step](docs/screenshots/follow-add.gif)
 
 ## Basic Computer (Ch. 5–6)
 
 The page is a workbench, laid out like a logic analyzer:
+
+![The Basic Computer workbench: circuit, inspector, and the timing diagram of ADD 205](docs/screenshots/basic-computer.jpg)
 
 - **The circuit**, zoomable: the control unit of Fig. 5-6 (IR, the 3 × 8 and 4 × 16 decoders, SC,
   flip-flops and the control logic gates), the bus select encoder of Table 5-7, the common bus and
@@ -34,9 +36,8 @@ Every clock pulse is shown in **four sub-steps**, in the order the hardware sett
 4. **Clock edge**: every enabled register and flip-flop stores its new value at the same instant.
 
 **Follow** turns the canvas into a camera that glides to wherever each sub-step happens, with a
-caption, so you ride along with the signal.
+caption, so you ride along with the signal (the animation at the top of this page).
 
-![Follow: the camera on the D1T4 gate, with T4 and D1 feeding it](docs/screenshots/follow-camera.jpg)
 
 **X-ray**: hover a memory word and every part of the circuit its instruction will use, over all
 of its pulses, is outlined. **Usage**: shade every part by how often the program used it.

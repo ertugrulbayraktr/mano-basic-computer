@@ -32,8 +32,8 @@ export function App() {
       <div className="shell">
         <header className="topbar">
           <a href="#/computer" className="brand">
-            <span className="brand-name">Mano</span>
-            <span className="brand-sub">the Basic Computer, clock by clock</span>
+            <span className="brand-name">Mano Basic Computer</span>
+            <span className="brand-sub">Interactive simulator for Computer System Architecture by M. Morris Mano</span>
           </a>
           <nav aria-label="Sections" className="rooms">
             {MAIN.map((r) => (
