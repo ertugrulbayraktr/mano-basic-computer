@@ -13,6 +13,8 @@ export function MemoryView() {
   const sim = useSim();
   const setMemory = useComputer((s) => s.setMemory);
   const toggleBreakpoint = useComputer((s) => s.toggleBreakpoint);
+  // Hovering a word x-rays the instruction it holds on the circuit.
+  const setXray = (xray: number | null) => useComputer.getState().setView({ xray });
   const [scroll, setScroll] = useState(0);
   const [follow, setFollow] = useState(true);
   const [goto, setGoto] = useState('');
@@ -82,6 +84,10 @@ export function MemoryView() {
                   role="row"
                   className={`mem-row ${a === AR ? 'ar' : ''} ${written.has(a) ? 'written' : ''}`}
                   style={{ position: 'absolute', top: a * ROW_H, left: 0, right: 0 }}
+                  onMouseEnter={() => setXray(a)}
+                  onMouseLeave={() => setXray(null)}
+                  onFocus={() => setXray(a)}
+                  onBlur={() => setXray(null)}
                 >
                   <span role="cell">
                     <button className="bp" aria-pressed={sim.breakpoints.has(a)} aria-label={`Breakpoint at ${a.toString(16)}`} onClick={() => toggleBreakpoint(a)} />

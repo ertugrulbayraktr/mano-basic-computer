@@ -26,6 +26,15 @@ interface ComputerStore {
    * 3 clock edge (the pulse is complete). See core/basic/microsteps.ts.
    */
   sub: number;
+  /** Camera follows each sub-step. */
+  follow: boolean;
+  /** Shade circuit elements by how often the program used them. */
+  usage: boolean;
+  /** Address whose instruction is x-rayed on the circuit, or null. */
+  xray: number | null;
+  setView: (v: Partial<Pick<ComputerStore, 'follow' | 'usage' | 'xray'>>) => void;
+  /** Move to just after pulse `pulse` (0 = start), showing sub-step `sub`. */
+  seek: (pulse: number, sub?: number) => void;
   subNext: () => void;
   subPrev: () => void;
   pulse: () => void;
@@ -115,6 +124,16 @@ export const useComputer = create<ComputerStore>((set, get) => {
     frame = requestAnimationFrame(tick);
   };
 
+  /** The next pulse: brought back by redo when the future is known, else simulated. */
+  const advance = () => {
+    while (sim.canRedo) {
+      const before = sim.pulses;
+      sim.redo();
+      if (sim.pulses !== before) return;
+    }
+    sim.step();
+  };
+
   const loadInto = (p: LoadedProgram) => {
     sim.load(p.mem, p.reg?.PC ?? 0);
     Object.assign(sim.state.reg, p.reg);
@@ -128,11 +147,20 @@ export const useComputer = create<ComputerStore>((set, get) => {
     status: null,
     program: null,
     sub: 3,
+    follow: false,
+    usage: false,
+    xray: null,
+    setView: (v) => set(v),
+    seek: (pulse, sub = 3) => {
+      get().pause();
+      sim.seek(pulse);
+      bump(null, sim.lastTrace ? sub : 3);
+    },
     subNext: () => {
       get().pause();
       if (sim.lastTrace && get().sub < 3) return bump(null, get().sub + 1);
-      if (sim.halted) return bump(haltedStatus());
-      sim.step();
+      if (sim.halted && !sim.canRedo) return bump(haltedStatus());
+      advance();
       bump(null, 0);
     },
     subPrev: () => {
@@ -145,12 +173,17 @@ export const useComputer = create<ComputerStore>((set, get) => {
       get().pause();
       // Finish a pulse that is being shown sub-step by sub-step before starting a new one.
       if (sim.lastTrace && get().sub < 3) return bump();
-      sim.step();
+      advance();
       bump(haltedStatus());
     },
     instruction: () => {
       get().pause();
-      if (!(sim.lastTrace && get().sub < 3 && sim.state.SC === 0)) sim.stepInstruction();
+      if (!(sim.lastTrace && get().sub < 3 && sim.state.SC === 0)) {
+        let n = 0;
+        do {
+          advance();
+        } while (!sim.halted && sim.state.SC !== 0 && ++n < 16);
+      }
       bump(haltedStatus());
     },
     back: () => {

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 import type { Base } from '../core/bits';
 import type { ArithmeticEncoding } from '../core/alu/arithmetic';
+import { DEFAULT_LANES } from '../core/basic/waveforms';
 
 /** localStorage that never throws (private mode, blocked storage, previews). */
 export const safeStorage: StateStorage = {
@@ -40,6 +41,12 @@ interface Settings {
   encoding: ArithmeticEncoding;
   speedIndex: number;
   printerDelay: number;
+  /** Lanes shown in the timing diagram. */
+  lanes: string[];
+  /** Height of the bottom dock in px; 0 means collapsed. */
+  dockHeight: number;
+  setLanes: (l: string[]) => void;
+  setDockHeight: (h: number) => void;
   setBase: (b: Base) => void;
   setSigned: (s: boolean) => void;
   setWidth: (w: Width) => void;
@@ -57,6 +64,10 @@ export const useSettings = create<Settings>()(
       encoding: 'table4-8',
       speedIndex: 3,
       printerDelay: 20,
+      lanes: DEFAULT_LANES,
+      dockHeight: 260,
+      setLanes: (lanes) => set({ lanes }),
+      setDockHeight: (dockHeight) => set({ dockHeight: dockHeight === 0 ? 0 : Math.max(140, Math.min(560, dockHeight)) }),
       setBase: (base) => set({ base }),
       setSigned: (signed) => set({ signed }),
       setWidth: (width) => set({ width }),

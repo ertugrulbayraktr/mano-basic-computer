@@ -91,11 +91,16 @@ export class Simulator {
     return this.pulses - this.timeline.length;
   }
 
+  /**
+   * Traces of undone pulses that redo can bring back, nearest last. The timing diagram shows
+   * them as the reachable future.
+   */
+  future: PulseTrace[] = [];
+
   /** The furthest pulse that redo can reach from here. */
   get latestPulse(): number {
-    return this.pulses + this.redoPulseCount;
+    return this.pulses + this.future.length;
   }
-  private redoPulseCount = 0;
 
   get halted(): boolean {
     return !this.state.flag.S;
@@ -112,7 +117,7 @@ export class Simulator {
     this.timeline = [];
     this.undoStack = [];
     this.redoStack = [];
-    this.redoPulseCount = 0;
+    this.future = [];
   }
 
   /** Loads words into memory and sets PC. Clears the undo history (a new program starts). */
@@ -181,9 +186,9 @@ export class Simulator {
     const e = this.undoStack.pop();
     if (!e) return false;
     if (e.pulses !== this.pulses) {
-      // The entry was a pulse: drop its trace from the timeline.
-      this.timeline.pop();
-      this.redoPulseCount++;
+      // The entry was a pulse: move its trace from the timeline to the future.
+      const t = this.timeline.pop();
+      if (t) this.future.push(t);
     }
     this.redoStack.push(e.redo);
     const mem = this.state.mem.slice();
@@ -207,7 +212,7 @@ export class Simulator {
     } finally {
       this.replaying = false;
     }
-    if (this.pulses !== before) this.redoPulseCount--;
+    if (this.pulses !== before) this.future.pop();
     return true;
   }
 
@@ -302,7 +307,7 @@ export class Simulator {
   private newAction(): void {
     if (this.replaying) return;
     this.redoStack = [];
-    this.redoPulseCount = 0;
+    this.future = [];
   }
 
   private snapshot(redo: () => void): UndoEntry {
