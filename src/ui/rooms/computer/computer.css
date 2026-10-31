@@ -680,3 +680,19 @@ dialog.modal::backdrop {
     transition: none;
   }
 }
+
+/* ALU inputs in the dock */
+.alu-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+.alu-inputs .bit {
+  /* BitInput sizes its buttons inline; the dock needs them smaller. */
+  width: 27px !important;
+  height: 28px !important;
+  font-size: 13px !important;
+}
+.alu-inputs .cap {
+  font-size: 11.5px;
+}

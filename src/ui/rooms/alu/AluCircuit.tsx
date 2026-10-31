@@ -1,6 +1,6 @@
 import type { Bit } from '../../../core/bits';
 import type { AluCircuit as AluData, AluStage } from '../../../core/alu/aluSteps';
-import { CircuitCanvas } from '../../circuit/CircuitCanvas';
+import { CircuitCanvas, type Rect } from '../../circuit/CircuitCanvas';
 import { Block, Mux, muxInputY, Text, Wire, type Pt } from '../../circuit/parts';
 import { GateSymbol } from '../../common/GateSymbol';
 
@@ -27,7 +27,23 @@ function V({ points, value, settled, kind = 'data' }: { points: Pt[]; value: Bit
   return <Wire points={points} on={settled && value === 1} dashed={!settled} kind={kind} />;
 }
 
-export function AluCircuit({ data, step }: { data: AluData; step: number }) {
+/** What the follow camera frames at each propagation step. */
+export function aluFocusRect(data: AluData, step: number): Rect {
+  const n = data.width;
+  const W = LEFT + n * COL + 40;
+  const x0 = (i: number) => LEFT + (n - 1 - i) * COL;
+  if (step <= 0) return { x: 0, y: 0, w: W, h: 860 };
+  if (step === 1) return { x: LEFT - 40, y: 60, w: n * COL + 40, h: 170 };
+  if (step < 2 + n) {
+    const i = step - 2;
+    return { x: x0(i) - 100, y: 50, w: COL + 140, h: 200 };
+  }
+  if (step === 2 + n) return { x: LEFT - 40, y: 250, w: n * COL + 40, h: 210 };
+  if (step === 3 + n) return { x: LEFT, y: 470, w: n * COL, h: 270 };
+  return { x: LEFT - 30, y: 740, w: n * COL, h: 120 };
+}
+
+export function AluCircuit({ data, step, follow = false }: { data: AluData; step: number; follow?: boolean }) {
   const n = data.width;
   const W = LEFT + n * COL + 40;
   const H = 860;
@@ -42,7 +58,7 @@ export function AluCircuit({ data, step }: { data: AluData; step: number }) {
   const bit = (b: Bit, settled: boolean) => (settled ? String(b) : '·');
 
   return (
-    <CircuitCanvas width={W} height={H} label="ALU circuit, Fig. 4-13, all stages">
+    <CircuitCanvas width={W} height={H} label="ALU circuit, Fig. 4-13, all stages" focus={follow ? aluFocusRect(data, step) : null}>
       {/* Select lines shared by every stage */}
       {[
         [SEL_Y, `S1S0 = ${s1s0.toString(2).padStart(2, '0')}`],

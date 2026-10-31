@@ -137,3 +137,33 @@ export function aluCircuit(a: number, b: number, select: number, cin: Bit, width
     steps,
   };
 }
+
+export interface AluLaneValue {
+  id: 'Y' | 'C' | 'D' | 'E' | 'F' | 'CSZV';
+  label: string;
+  /** Bits MSB first; '·' marks a bit that has not settled yet at that step. */
+  value: string;
+}
+
+/**
+ * The words inside the ALU as they look after `step` of the propagation: which bits of Y, the
+ * carries C(n)…C(1), D, E, F and the status bits have settled. Used by the propagation timeline.
+ */
+export function aluSnapshot(c: AluCircuit, step: number): AluLaneValue[] {
+  const n = c.width;
+  const word = (bit: (s: AluStage) => Bit, settled: (s: AluStage) => boolean) =>
+    [...c.stages].reverse().map((s) => (settled(s) ? String(bit(s)) : '·')).join('');
+  const faDone = (i: number) => step >= 2 + i;
+  return [
+    { id: 'Y', label: 'Y', value: word((s) => s.y, () => step >= 1) },
+    { id: 'C', label: `C${n}…C1`, value: word((s) => s.cout, (s) => faDone(s.i)) },
+    { id: 'D', label: 'D', value: word((s) => s.d, (s) => faDone(s.i)) },
+    { id: 'E', label: 'E', value: word((s) => s.e, () => step >= 2 + n) },
+    { id: 'F', label: 'F', value: word((s) => s.f, () => step >= 3 + n) },
+    {
+      id: 'CSZV',
+      label: 'C S Z V',
+      value: step >= 4 + n ? `${c.status.c}${c.status.s}${c.status.z}${c.status.v}` : '····',
+    },
+  ];
+}

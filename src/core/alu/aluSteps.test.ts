@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Bit } from '../bits';
 import { alu, aluTable } from './alu';
-import { aluCircuit } from './aluSteps';
+import { aluCircuit, aluSnapshot } from './aluSteps';
 
 describe('ALU circuit stages (Fig. 4-13)', () => {
   it('0110 + 0011 = 1001 stage by stage, with C=0 S=1 Z=0 V=1', () => {
@@ -41,5 +41,19 @@ describe('ALU circuit stages (Fig. 4-13)', () => {
             expect(c.status).toEqual(ref.status);
             expect(c.stages.reduce((v, s) => v | (s.f << s.i), 0)).toBe(ref.f);
           }
+  });
+});
+
+describe('ALU propagation snapshots', () => {
+  it('bits settle step by step for 0110 + 0011', () => {
+    const c = aluCircuit(0b0110, 0b0011, 0b0001, 0, 4);
+    const at = (step: number) => Object.fromEntries(aluSnapshot(c, step).map((l) => [l.id, l.value]));
+    expect(at(0)).toEqual({ Y: '····', C: '····', D: '····', E: '····', F: '····', CSZV: '····' });
+    expect(at(1).Y).toBe('0011');
+    expect(at(3)).toMatchObject({ C: '··10', D: '··01' });
+    expect(at(5)).toMatchObject({ C: '0110', D: '1001', E: '····' });
+    expect(at(6).E).toBe('0111');
+    expect(at(7).F).toBe('1001');
+    expect(at(8).CSZV).toBe('0101');
   });
 });
